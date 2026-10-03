@@ -1,0 +1,152 @@
+"Nhiệm vụ","Tuần","Người phụ trách","Ưu tiên","Trạng thái","Giai đoạn","Mốc","Kết quả cần đạt","Cần xong trước","Trang hướng dẫn"
+"Cài đặt, chạy khung","Tuần 01","Cả nhóm","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","","• Mỗi người chạy được app trên máy mình, đăng nhập tài khoản demo
+• Thêm, sửa, xóa được một tòa nhà
+• Project đặt ngoài OneDrive","","Kế hoạch 12 tuần › Tuần 01 - Khởi động và học nền"
+"Học nền, bài tập đọc hiểu","Tuần 01","Cả nhóm","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","","• Nắm Git, JavaScript/TypeScript, React, REST cơ bản
+• Tự vẽ đường đi của thao tác “Thêm tòa nhà” qua các file
+• Thêm thử trường managerPhone trên nhánh practice (không merge)","","Kế hoạch 12 tuần › Tuần 01 - Khởi động và học nền"
+"Tổ chức nhóm","Tuần 01","TV1","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","","• Bảng phân công đã điền tên
+• GitHub Projects có issue tuần 1–2
+• Đã hỏi giáo viên tiêu chí chấm và hạn nộp
+• Đã hẹn 1–2 chủ trọ để khảo sát","","Kế hoạch 12 tuần › Tuần 01 - Khởi động và học nền"
+"Tạo repo, hướng dẫn Git","Tuần 01","TV2","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","","• Repo private có nhánh main, dev, đã bảo vệ nhánh
+• Buổi “Git 30 phút”: cả 4 người có 1 PR được merge
+• Mỗi người có database Neon riêng","","Kế hoạch 12 tuần › Tuần 01 - Khởi động và học nền"
+"Câu hỏi khảo sát tính tiền","Tuần 01","TV3","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","","• 10–15 câu hỏi cho chủ trọ, lấy từ trang 03 Công thức tính tiền
+• Đã chạy npm test và đọc hiểu billing.ts","","Kế hoạch 12 tuần › Tuần 01 - Khởi động và học nền"
+"Tìm hiểu PWA, giao diện mẫu","Tuần 01","TV4","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","","• Ghi chú 1 trang về PWA gửi nhóm
+• Cài thử 2 PWA trên điện thoại
+• 5–10 ảnh giao diện tham khảo","","Kế hoạch 12 tuần › Tuần 01 - Khởi động và học nền"
+"Khảo sát, họp chốt thiết kế","Tuần 02","Cả nhóm","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","Chốt thiết kế","• Trang Notion “Biên bản khảo sát”
+• 3 khó khăn lớn nhất của chủ trọ
+• Họp chốt: yêu cầu → tính tiền → ERD → API → wireframe","T1 · Tổ chức nhóm (TV1), T1 · Câu hỏi khảo sát tính tiền (TV3)","Kế hoạch 12 tuần › Tuần 02 - Phân tích và thiết kế"
+"Yêu cầu chức năng, wireframe","Tuần 02","TV1","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","Chốt thiết kế","• Trang 02 Yêu cầu chức năng đã chốt, mỗi mục có tiêu chí chấp nhận
+• Sơ đồ use case cho 2 tác nhân
+• Wireframe Dashboard, Phòng, Sơ đồ phòng","T2 · Khảo sát, họp chốt thiết kế (Cả nhóm)","Kế hoạch 12 tuần › Tuần 02 - Phân tích và thiết kế"
+"Review ERD, chốt API","Tuần 02","TV2","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","Chốt thiết kế","• schema.prisma v1 merge trước tuần 3
+• Trang 05 Danh sách API đủ cho mọi chức năng bắt buộc
+• Label và milestone trên GitHub","","Kế hoạch 12 tuần › Tuần 02 - Phân tích và thiết kế"
+"Chốt công thức tính tiền","Tuần 02","TV3","MVP bắt buộc","Chưa làm","Thiết kế","Chốt thiết kế","• Mọi ô “Quyết định của nhóm” trong trang 03 Công thức tính tiền đã điền
+• 5 ca kiểm thử tính tay, có người kiểm lại
+• Kết quả mong đợi điền vào các it.todo
+⚠ Chưa chốt công thức thì chưa sang tuần 3.","T2 · Khảo sát, họp chốt thiết kế (Cả nhóm)","Kế hoạch 12 tuần › Tuần 02 - Phân tích và thiết kế"
+"Wireframe cổng khách thuê","Tuần 02","TV4","Tổ chức / học / tài liệu","Chưa làm","Thiết kế","Chốt thiết kế","• 5 màn hình khổ điện thoại
+• Sơ đồ trạng thái yêu cầu sửa chữa
+• Danh sách các thông báo hệ thống sẽ gửi","","Kế hoạch 12 tuần › Tuần 02 - Phân tích và thiết kế"
+"Module Phòng","Tuần 03","TV1","MVP bắt buộc","Chưa làm","Xây MVP","","• 5 API /rooms, kiểm tra quyền qua building.ownerId
+• Trang Phòng lọc theo tòa nhà, Tag màu trạng thái
+• Tạo src/utils/status.ts dùng chung","T2 · Review ERD, chốt API (TV2)","Kế hoạch 12 tuần › Tuần 03 - MVP · Phòng, Khách thuê, Hàm tính tiền, Báo sự cố"
+"Khách thuê, cấp tài khoản","Tuần 03","TV2","MVP bắt buộc","Chưa làm","Xây MVP","","• CRUD khách thuê, tìm theo tên hoặc SĐT
+• POST /tenants/:id/account trong transaction
+• Khách đăng nhập được, vào thẳng /portal","T2 · Review ERD, chốt API (TV2)","Kế hoạch 12 tuần › Tuần 03 - MVP · Phòng, Khách thuê, Hàm tính tiền, Báo sự cố"
+"Hàm tính tiền, unit test","Tuần 03","TV3","MVP bắt buộc","Chưa làm","Xây MVP","","• Xong 3 hàm TODO trong billing.ts
+• buildInvoiceItems() cho một hợp đồng một kỳ
+• ≥ 20 test qua, ca 3.940.000đ đúng từng đồng","T2 · Chốt công thức tính tiền (TV3)","Kế hoạch 12 tuần › Tuần 03 - MVP · Phòng, Khách thuê, Hàm tính tiền, Báo sự cố"
+"Báo sự cố (phía khách)","Tuần 03","TV4","MVP bắt buộc","Chưa làm","Xây MVP","","• POST/GET /portal/maintenance, phòng lấy từ hợp đồng hiệu lực
+• Trang báo sự cố dùng tốt ở khổ 375px
+• Hàm dùng chung getActiveContractOfUser()","T2 · Wireframe cổng khách thuê (TV4)","Kế hoạch 12 tuần › Tuần 03 - MVP · Phòng, Khách thuê, Hàm tính tiền, Báo sự cố"
+"Dịch vụ, chi tiết phòng","Tuần 04","TV1","MVP bắt buộc","Chưa làm","Xây MVP","","• CRUD dịch vụ với 3 kiểu tính
+• Dịch vụ đã dùng thì ẩn thay vì xóa
+• Trang /rooms/:id có hợp đồng hiện tại và 6 kỳ chỉ số","T3 · Module Phòng (TV1)","Kế hoạch 12 tuần › Tuần 04 - MVP · Dịch vụ, Hợp đồng, Chỉ số điện nước, Xử lý sự cố, Thông báo"
+"Module Hợp đồng","Tuần 04","TV2","MVP bắt buộc","Chưa làm","Xây MVP","","• Tạo hợp đồng trong transaction, phòng chuyển Đang thuê
+• Một phòng tối đa 1 hợp đồng ACTIVE
+• Kết thúc hợp đồng, phòng về Trống","T3 · Module Phòng (TV1), T3 · Khách thuê, cấp tài khoản (TV2)","Kế hoạch 12 tuần › Tuần 04 - MVP · Dịch vụ, Hợp đồng, Chỉ số điện nước, Xử lý sự cố, Thông báo"
+"Chỉ số điện nước","Tuần 04","TV3","MVP bắt buộc","Chưa làm","Xây MVP","","• Bảng chỉ số cả tòa nhà, chỉ số cũ tự gợi ý
+• PUT /meter-readings/bulk lưu hàng loạt
+• Báo lỗi chỉ số mới nhỏ hơn cũ, cảnh báo bất thường","T3 · Module Phòng (TV1), T3 · Hàm tính tiền, unit test (TV3)","Kế hoạch 12 tuần › Tuần 04 - MVP · Dịch vụ, Hợp đồng, Chỉ số điện nước, Xử lý sự cố, Thông báo"
+"Xử lý sự cố, Thông báo","Tuần 04","TV4","MVP bắt buộc","Chưa làm","Xây MVP","","• Chủ nhà đổi trạng thái sự cố theo quy tắc
+• Hàm notify() dùng chung cho cả nhóm
+• Chuông thông báo ở cả 2 giao diện","T3 · Báo sự cố (phía khách) (TV4)","Kế hoạch 12 tuần › Tuần 04 - MVP · Dịch vụ, Hợp đồng, Chỉ số điện nước, Xử lý sự cố, Thông báo"
+"Sơ đồ phòng, tìm kiếm","Tuần 05","TV1","MVP bắt buộc","Chưa làm","Xây MVP","","• Trang /room-map: phòng xếp theo tầng, màu theo trạng thái
+• Bấm ô phòng mở trang chi tiết phòng
+• Sắp xếp và tìm kiếm ở các bảng","T4 · Dịch vụ, chi tiết phòng (TV1), T4 · Module Hợp đồng (TV2)","Kế hoạch 12 tuần › Tuần 05 - MVP · Tạo hóa đơn, Cổng khách thuê, Sơ đồ phòng"
+"Chi tiết hợp đồng, bảo mật lần 1","Tuần 05","TV2","MVP bắt buộc","Chưa làm","Xây MVP","","• Sửa người ở, dịch vụ, người đại diện
+• Danh sách hợp đồng sắp hết hạn
+• Báo cáo kiểm tra bảo mật: chủ nhà B không đọc được dữ liệu chủ nhà A","T4 · Module Hợp đồng (TV2)","Kế hoạch 12 tuần › Tuần 05 - MVP · Tạo hóa đơn, Cổng khách thuê, Sơ đồ phòng"
+"Tạo hóa đơn hàng loạt","Tuần 05","TV3","MVP bắt buộc","Chưa làm","Xây MVP","","• POST /invoices/generate tạo hóa đơn nháp
+• Chạy 2 lần không trùng, báo rõ phòng thiếu chỉ số
+• InvoiceStatusTag, InvoiceItemsTable dùng chung với TV4","T3 · Hàm tính tiền, unit test (TV3), T4 · Module Hợp đồng (TV2), T4 · Chỉ số điện nước (TV3)","Kế hoạch 12 tuần › Tuần 05 - MVP · Tạo hóa đơn, Cổng khách thuê, Sơ đồ phòng"
+"Cổng khách thuê","Tuần 05","TV4","MVP bắt buộc","Chưa làm","Xây MVP","","• GET /portal/me và /portal/invoices
+• 4 trang: trang chủ, hóa đơn, chi tiết, hợp đồng
+• Đổi id trên URL sang hóa đơn người khác phải ra 404","T3 · Báo sự cố (phía khách) (TV4), T5 · Tạo hóa đơn hàng loạt (TV3)","Kế hoạch 12 tuần › Tuần 05 - MVP · Tạo hóa đơn, Cổng khách thuê, Sơ đồ phòng"
+"Dashboard","Tuần 06","TV1","MVP bắt buộc","Chưa làm","Xây MVP","","• GET /dashboard/summary: phòng trống, đã thu, còn phải thu
+• Danh sách 5 hóa đơn quá hạn
+• Số liệu khớp khi đếm tay","T5 · Tạo hóa đơn hàng loạt (TV3)","Kế hoạch 12 tuần › Tuần 06 - MVP · Phát hành và thu tiền, Dashboard, Deploy lần 1, In hóa đơn"
+"Deploy lần 1","Tuần 06","TV2","MVP bắt buộc","Chưa làm","Xây MVP","","• Frontend Vercel, backend Render, DB Neon production
+• F5 ở trang con không bị 404
+• Trang Notion “Hướng dẫn deploy”","","Kế hoạch 12 tuần › Tuần 06 - MVP · Phát hành và thu tiền, Dashboard, Deploy lần 1, In hóa đơn"
+"Phát hành và thu tiền","Tuần 06","TV3","MVP bắt buộc","Chưa làm","Xây MVP","","• Sửa khoản khi còn nháp, tổng tính lại ở server
+• Phát hành → khách nhận thông báo
+• applyPayment() dùng chung cho webhook","T5 · Tạo hóa đơn hàng loạt (TV3), T4 · Xử lý sự cố, Thông báo (TV4)","Kế hoạch 12 tuần › Tuần 06 - MVP · Phát hành và thu tiền, Dashboard, Deploy lần 1, In hóa đơn"
+"In hóa đơn, rà điện thoại","Tuần 06","TV4","MVP bắt buộc","Chưa làm","Xây MVP","","• Nút In / Lưu PDF dạng phiếu báo tiền
+• Rà mọi trang ở khổ 375px, giao lỗi cho người phụ trách","T5 · Tạo hóa đơn hàng loạt (TV3)","Kế hoạch 12 tuần › Tuần 06 - MVP · Phát hành và thu tiền, Dashboard, Deploy lần 1, In hóa đơn"
+"Kiểm thử chéo, sửa lỗi","Tuần 07","Cả nhóm","MVP bắt buộc","Chưa làm","Xây MVP","MVP chạy online","• Mỗi người thử module của người khác ≥ 1 giờ
+• Lỗi ghi thành issue, nhãn bug
+• Hết thứ Sáu không còn lỗi chặn demo
+⚠ Tuần này không thêm tính năng mới.","T6 · Dashboard (TV1), T6 · Deploy lần 1 (TV2), T6 · Phát hành và thu tiền (TV3), T6 · In hóa đơn, rà điện thoại (TV4)","Kế hoạch 12 tuần › Tuần 07 - Mốc MVP — kiểm thử chéo, sửa lỗi, ổn định"
+"Kịch bản demo, kiểm thử","Tuần 07","TV1","Tổ chức / học / tài liệu","Chưa làm","Xây MVP","MVP chạy online","• Trang “Kịch bản demo” dài 5–7 phút
+• Trang “Kịch bản kiểm thử” ≥ 30 dòng
+• Biên bản họp rút kinh nghiệm","","Kế hoạch 12 tuần › Tuần 07 - Mốc MVP — kiểm thử chéo, sửa lỗi, ổn định"
+"Phát hành v0.5","Tuần 07","TV2","MVP bắt buộc","Chưa làm","Xây MVP","MVP chạy online","• PR dev → main, gắn tag v0.5
+• Bản online chạy hết kịch bản demo","T6 · Deploy lần 1 (TV2), T7 · Kiểm thử chéo, sửa lỗi (Cả nhóm)","Kế hoạch 12 tuần › Tuần 07 - Mốc MVP — kiểm thử chéo, sửa lỗi, ổn định"
+"Dữ liệu demo thực tế","Tuần 07","TV3","Tổ chức / học / tài liệu","Chưa làm","Xây MVP","MVP chạy online","• 2 tòa nhà, ~12 phòng, 3 tháng hóa đơn đủ trạng thái
+• Seed lại bản online","","Kế hoạch 12 tuần › Tuần 07 - Mốc MVP — kiểm thử chéo, sửa lỗi, ổn định"
+"Rà soát trải nghiệm","Tuần 07","TV4","Tổ chức / học / tài liệu","Chưa làm","Xây MVP","MVP chạy online","• Mọi trang có trạng thái rỗng và đang tải
+• Thử trên điện thoại thật","","Kế hoạch 12 tuần › Tuần 07 - Mốc MVP — kiểm thử chéo, sửa lỗi, ổn định"
+"Biểu đồ, xuất Excel","Tuần 08","TV1","Nếu dư thời gian","Chưa làm","Công nghệ nâng cao","","• GET /dashboard/revenue cho 6 tháng
+• Biểu đồ cột Phát hành và Đã thu
+• Xuất CSV mở bằng Excel đúng tiếng Việt","T6 · Dashboard (TV1)","Kế hoạch 12 tuần › Tuần 08 - Nâng cao · PWA, VietQR, Job tự động, Biểu đồ"
+"VietQR trên hóa đơn","Tuần 08","TV2","Công nghệ trọng tâm","Chưa làm","Công nghệ nâng cao","","• Chủ nhà khai báo tài khoản nhận tiền
+• Khách thấy mã QR, quét ra đúng số tiền và nội dung
+• Chốt nhà cung cấp webhook hoặc phương án giả lập","T6 · Phát hành và thu tiền (TV3), T5 · Cổng khách thuê (TV4)","Kế hoạch 12 tuần › Tuần 08 - Nâng cao · PWA, VietQR, Job tự động, Biểu đồ"
+"Job tự động (cron)","Tuần 08","TV3","Công nghệ trọng tâm","Chưa làm","Công nghệ nâng cao","","• 07:00 ngày 1 tự tạo hóa đơn nháp
+• 08:00 hằng ngày nhắc hóa đơn quá hạn
+• Nút “Chạy ngay” để demo, không tạo trùng","T5 · Tạo hóa đơn hàng loạt (TV3), T4 · Xử lý sự cố, Thông báo (TV4)","Kế hoạch 12 tuần › Tuần 08 - Nâng cao · PWA, VietQR, Job tự động, Biểu đồ"
+"PWA","Tuần 08","TV4","Công nghệ trọng tâm","Chưa làm","Công nghệ nâng cao","","• Cài được lên điện thoại, có icon riêng
+• Mất mạng vẫn mở được khung app
+• Nút cài, hướng dẫn cho iPhone, thông báo cập nhật","T6 · Deploy lần 1 (TV2)","Kế hoạch 12 tuần › Tuần 08 - Nâng cao · PWA, VietQR, Job tự động, Biểu đồ"
+"Socket.IO realtime","Tuần 09","TV1","Nếu dư thời gian","Chưa làm","Công nghệ nâng cao","","• Kết nối socket bắt buộc có JWT
+• notify() phát sự kiện notification:new
+• Chuông nhảy ngay ở 2 cửa sổ","T4 · Xử lý sự cố, Thông báo (TV4)","Kế hoạch 12 tuần › Tuần 09 - Nâng cao · Webhook thanh toán, Web Push, Realtime"
+"Webhook tự gạch nợ","Tuần 09","TV2","Công nghệ trọng tâm","Chưa làm","Công nghệ nâng cao","","• Xác thực khóa bí mật hoặc chữ ký
+• Idempotency: gửi trùng không ghi nhận đôi
+• Chuyển khoản → hóa đơn tự Đã thanh toán","T8 · VietQR trên hóa đơn (TV2), T6 · Phát hành và thu tiền (TV3)","Kế hoạch 12 tuần › Tuần 09 - Nâng cao · Webhook thanh toán, Web Push, Realtime"
+"Ghi số trên điện thoại","Tuần 09","TV3","MVP bắt buộc","Chưa làm","Công nghệ nâng cao","","• Link thông báo mở đúng trang của khách
+• Chế độ “đi ghi số” mỗi lần một phòng
+• Cùng TV2 thử trả thiếu, trả thừa, trả 2 lần","T8 · Job tự động (cron) (TV3), T4 · Chỉ số điện nước (TV3)","Kế hoạch 12 tuần › Tuần 09 - Nâng cao · Webhook thanh toán, Web Push, Realtime"
+"Web Push","Tuần 09","TV4","Công nghệ trọng tâm","Chưa làm","Công nghệ nâng cao","","• Nút “Bật thông báo”, lưu đăng ký
+• notify() gửi push, kể cả khi đã đóng tab
+• Bấm thông báo mở đúng trang","T8 · PWA (TV4), T4 · Xử lý sự cố, Thông báo (TV4)","Kế hoạch 12 tuần › Tuần 09 - Nâng cao · Webhook thanh toán, Web Push, Realtime"
+"Tập vấn đáp theo cặp","Tuần 10","Cả nhóm","Tổ chức / học / tài liệu","Chưa làm","Công nghệ nâng cao","","• 15 phút mỗi buổi họp, hỏi chéo phần của nhau
+• Dùng bộ câu hỏi trong trang 08 Vấn đáp và báo cáo","","Kế hoạch 12 tuần › Tuần 10 - Nâng cao · Tích hợp, Bảo mật, Offline"
+"Tích hợp realtime","Tuần 10","TV1","Nếu dư thời gian","Chưa làm","Công nghệ nâng cao","","• invoice:paid cập nhật hóa đơn ngay lập tức
+• maintenance:new báo chủ nhà
+• Video demo realtime dự phòng","T9 · Socket.IO realtime (TV1), T9 · Webhook tự gạch nợ (TV2)","Kế hoạch 12 tuần › Tuần 10 - Nâng cao · Tích hợp, Bảo mật, Offline"
+"Bảo mật lần 2","Tuần 10","TV2","MVP bắt buộc","Chưa làm","Công nghệ nâng cao","","• Giới hạn số lần đăng nhập sai
+• Đổi mật khẩu, đặt lại mật khẩu cho khách
+• Webhook chạy trên bản online","T9 · Webhook tự gạch nợ (TV2)","Kế hoạch 12 tuần › Tuần 10 - Nâng cao · Tích hợp, Bảo mật, Offline"
+"Ghi chỉ số offline","Tuần 10","TV3","Nếu dư thời gian","Chưa làm","Công nghệ nâng cao","","• Mất mạng vẫn lưu tạm trên máy (IndexedDB)
+• Có mạng thì tự đồng bộ, xử lý xung đột
+• Hoặc thay bằng hóa đơn tất toán khi trả phòng","T9 · Ghi số trên điện thoại (TV3), T8 · PWA (TV4)","Kế hoạch 12 tuần › Tuần 10 - Nâng cao · Tích hợp, Bảo mật, Offline"
+"Hoàn thiện PWA","Tuần 10","TV4","Công nghệ trọng tâm","Chưa làm","Công nghệ nâng cao","","• Xem hóa đơn đã tải khi mất mạng
+• Đăng xuất xóa cache dữ liệu cá nhân
+• Lighthouse ≥ 90","T9 · Web Push (TV4)","Kế hoạch 12 tuần › Tuần 10 - Nâng cao · Tích hợp, Bảo mật, Offline"
+"Kiểm thử vòng 2, viết báo cáo","Tuần 11","Cả nhóm","MVP bắt buộc","Chưa làm","Hoàn thiện và bảo vệ","Đóng băng","• Chạy lại Kịch bản kiểm thử trên bản online, đổi cặp
+• Mỗi người nộp phần báo cáo của mình trước thứ Năm
+• Không thêm tính năng mới
+⚠ Tính năng còn dở thì ẩn đi và ghi vào mục Hạn chế.","","Kế hoạch 12 tuần › Tuần 11 - Đóng băng tính năng — Kiểm thử vòng 2, Viết báo cáo"
+"Tổng hợp báo cáo","Tuần 11","TV1","Tổ chức / học / tài liệu","Chưa làm","Hoàn thiện và bảo vệ","Đóng băng","• Báo cáo đủ chương, có mục lục tự động
+• Phụ lục đóng góp của từng người","T11 · Kiểm thử vòng 2, viết báo cáo (Cả nhóm)","Kế hoạch 12 tuần › Tuần 11 - Đóng băng tính năng — Kiểm thử vòng 2, Viết báo cáo"
+"Dọn code, README, v1.0-rc","Tuần 11","TV2","Tổ chức / học / tài liệu","Chưa làm","Hoàn thiện và bảo vệ","Đóng băng","• Hết TODO thừa, build không cảnh báo
+• README có link bản online
+• Deploy bản cuối, tag v1.0-rc","","Kế hoạch 12 tuần › Tuần 11 - Đóng băng tính năng — Kiểm thử vòng 2, Viết báo cáo"
+"Báo cáo kiểm thử, seed cuối","Tuần 11","TV3","Tổ chức / học / tài liệu","Chưa làm","Hoàn thiện và bảo vệ","Đóng băng","• Ảnh kết quả test và độ bao phủ
+• Viết chương Kiểm thử
+• 1 hóa đơn chưa trả dành cho demo QR","","Kế hoạch 12 tuần › Tuần 11 - Đóng băng tính năng — Kiểm thử vòng 2, Viết báo cáo"
+"Ảnh chụp, video dự phòng","Tuần 11","TV4","Tổ chức / học / tài liệu","Chưa làm","Hoàn thiện và bảo vệ","Đóng băng","• Bộ ảnh máy tính và điện thoại
+• Ảnh Lighthouse
+• Video demo 5–7 phút","","Kế hoạch 12 tuần › Tuần 11 - Đóng băng tính năng — Kiểm thử vòng 2, Viết báo cáo"
+"Slide, tập demo, bảo vệ","Tuần 12","Cả nhóm","MVP bắt buộc","Chưa làm","Hoàn thiện và bảo vệ","Bảo vệ","• Slide 12–15 trang, mỗi người làm phần mình
+• Tập trình bày 2 lần có bấm giờ
+• Mỗi người luyện vấn đáp ≥ 2 buổi
+• Tag v1.0, nộp đúng yêu cầu giáo viên","T11 · Tổng hợp báo cáo (TV1), T11 · Ảnh chụp, video dự phòng (TV4), T11 · Dọn code, README, v1.0-rc (TV2)","Kế hoạch 12 tuần › Tuần 12 - Bảo vệ"

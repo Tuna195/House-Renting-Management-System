@@ -1,0 +1,45 @@
+# Thử API ngay trong VS Code: cài extension "REST Client", rồi bấm "Send Request" phía trên mỗi request.
+# Mỗi người làm module mới thì thêm request mẫu của module mình vào cuối file.
+
+@baseUrl = http://localhost:4000/api
+
+### Kiểm tra server
+GET {{baseUrl}}/health
+
+### Đăng nhập (tài khoản demo trong README.md) — copy "token" trong kết quả dán vào biến @token bên dưới
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "chunha@demo.vn", "password": "123456" }
+
+### Lấy token tự động từ request "login" ở trên
+@token = {{login.response.body.token}}
+
+### Thông tin tài khoản đang đăng nhập
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### Danh sách tòa nhà
+GET {{baseUrl}}/buildings
+Authorization: Bearer {{token}}
+
+### Tạo tòa nhà
+POST {{baseUrl}}/buildings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Nhà trọ thử nghiệm",
+  "address": "Hà Nội",
+  "electricityPrice": 3500,
+  "waterPrice": 25000,
+  "waterBillingType": "PER_M3"
+}
+
+### Thử gửi dữ liệu sai → phải trả 400 kèm chi tiết lỗi
+POST {{baseUrl}}/buildings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "name": "", "electricityPrice": -1 }

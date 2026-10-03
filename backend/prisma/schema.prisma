@@ -1,0 +1,322 @@
+// =============================================================================
+// SCHEMA DATABASE — BẢN NHÁP v0.1
+// Đây là thiết kế ban đầu để cả nhóm review ở Tuần 2 (xem docs/04-thiet-ke-database.md).
+// Sửa schema xong thì chạy:  npm run db:migrate -- --name ten_thay_doi
+//
+// Quy ước:
+//  - Tiền lưu bằng Int, đơn vị VND (KHÔNG dùng Float cho tiền vì sai số làm tròn).
+//  - Kỳ thu tiền (period) lưu dạng chuỗi "YYYY-MM", ví dụ "2026-10".
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------- Người dùng
+
+enum Role {
+  LANDLORD // Chủ nhà
+  TENANT // Khách thuê
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  role         Role
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  buildings          Building[] // (chủ nhà) các tòa nhà sở hữu
+  tenants            Tenant[]             @relation("OwnerTenants") // (chủ nhà) danh sách khách thuê
+  tenantProfile      Tenant?              @relation("TenantAccount") // (khách thuê) hồ sơ gắn với tài khoản
+  meterReadings      MeterReading[]
+  maintenanceRequests MaintenanceRequest[]
+  notifications      Notification[]
+  pushSubscriptions  PushSubscription[]
+}
+
+// ----------------------------------------------------------------------------- Tòa nhà, phòng, dịch vụ
+
+enum WaterBillingType {
+  PER_M3 // Tính theo số khối trên đồng hồ
+  PER_PERSON // Tính khoán theo đầu người
+}
+
+model Building {
+  id               Int              @id @default(autoincrement())
+  ownerId          Int
+  name             String
+  address          String
+  description      String?
+  electricityPrice Int // VND / kWh (giá cố định; giá bậc thang xem docs/03-cong-thuc-tinh-tien.md)
+  waterPrice       Int // VND / m3 hoặc VND / người tùy waterBillingType
+  waterBillingType WaterBillingType @default(PER_M3)
+  invoiceDueDay    Int              @default(5) // Hạn đóng tiền: ngày X của tháng sau kỳ
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  owner    User      @relation(fields: [ownerId], references: [id])
+  rooms    Room[]
+  services Service[]
+}
+
+enum RoomStatus {
+  VACANT // Trống
+  OCCUPIED // Đang thuê
+  MAINTENANCE // Đang sửa chữa
+}
+
+model Room {
+  id            Int        @id @default(autoincrement())
+  buildingId    Int
+  name          String // VD: "P101"
+  floor         Int?
+  area          Float? // m2
+  baseRent      Int // Giá thuê niêm yết (VND/tháng)
+  maxOccupants  Int        @default(2)
+  status        RoomStatus @default(VACANT)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  building            Building             @relation(fields: [buildingId], references: [id])
+  contracts           Contract[]
+  meterReadings       MeterReading[]
+  maintenanceRequests MaintenanceRequest[]
+
+  @@unique([buildingId, name])
+}
+
+enum ServiceUnit {
+  PER_ROOM // Cố định mỗi phòng / tháng (VD: wifi, rác)
+  PER_PERSON // Nhân số người ở (VD: phí vệ sinh theo người)
+  PER_QUANTITY // Nhân số lượng khai báo trong hợp đồng (VD: gửi 2 xe máy)
+}
+
+model Service {
+  id         Int         @id @default(autoincrement())
+  buildingId Int
+  name       String
+  price      Int
+  unit       ServiceUnit @default(PER_ROOM)
+  isActive   Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+
+  building         Building          @relation(fields: [buildingId], references: [id])
+  contractServices ContractService[]
+}
+
+// ----------------------------------------------------------------------------- Khách thuê, hợp đồng
+
+model Tenant {
+  id          Int       @id @default(autoincrement())
+  ownerId     Int // Chủ nhà quản lý khách này
+  userId      Int?      @unique // Tài khoản đăng nhập cổng khách thuê (có thể chưa tạo)
+  fullName    String
+  phone       String
+  email       String?
+  idNumber    String? // Số CCCD
+  dateOfBirth DateTime?
+  hometown    String?
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  owner     User             @relation("OwnerTenants", fields: [ownerId], references: [id])
+  user      User?            @relation("TenantAccount", fields: [userId], references: [id])
+  contracts ContractTenant[]
+}
+
+enum ContractStatus {
+  ACTIVE // Đang hiệu lực
+  ENDED // Đã kết thúc (trả phòng)
+  CANCELLED // Hủy
+}
+
+model Contract {
+  id        Int            @id @default(autoincrement())
+  roomId    Int
+  startDate DateTime
+  endDate   DateTime?
+  rentPrice Int // Giá thuê thỏa thuận (có thể khác baseRent của phòng)
+  deposit   Int            @default(0) // Tiền cọc
+  status    ContractStatus @default(ACTIVE)
+  note      String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  room     Room              @relation(fields: [roomId], references: [id])
+  tenants  ContractTenant[]
+  services ContractService[]
+  invoices Invoice[]
+}
+
+// Bảng nối nhiều-nhiều: 1 hợp đồng có nhiều người ở, 1 người là đại diện
+model ContractTenant {
+  contractId Int
+  tenantId   Int
+  isPrimary  Boolean @default(false)
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@id([contractId, tenantId])
+}
+
+// Dịch vụ áp dụng cho hợp đồng, kèm số lượng (dùng cho ServiceUnit.PER_QUANTITY)
+model ContractService {
+  contractId Int
+  serviceId  Int
+  quantity   Int @default(1)
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  service  Service  @relation(fields: [serviceId], references: [id])
+
+  @@id([contractId, serviceId])
+}
+
+// ----------------------------------------------------------------------------- Chỉ số điện nước
+
+model MeterReading {
+  id            Int      @id @default(autoincrement())
+  roomId        Int
+  period        String // "YYYY-MM"
+  electricStart Int
+  electricEnd   Int
+  waterStart    Int
+  waterEnd      Int
+  recordedById  Int
+  recordedAt    DateTime @default(now())
+  note          String?
+
+  room       Room @relation(fields: [roomId], references: [id])
+  recordedBy User @relation(fields: [recordedById], references: [id])
+
+  @@unique([roomId, period])
+}
+
+// ----------------------------------------------------------------------------- Hóa đơn, thanh toán
+
+enum InvoiceStatus {
+  DRAFT // Nháp, chủ nhà còn sửa được
+  UNPAID // Đã phát hành, chưa thanh toán
+  PARTIAL // Thanh toán một phần
+  PAID // Đã thanh toán đủ
+  CANCELLED // Đã hủy
+}
+
+model Invoice {
+  id          Int           @id @default(autoincrement())
+  contractId  Int
+  period      String // "YYYY-MM"
+  status      InvoiceStatus @default(DRAFT)
+  totalAmount Int           @default(0)
+  paidAmount  Int           @default(0)
+  dueDate     DateTime
+  issuedAt    DateTime?
+  paymentCode String        @unique // Mã ghi trong nội dung chuyển khoản, VD "HD000123" — dùng để đối soát webhook
+  note        String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  contract Contract      @relation(fields: [contractId], references: [id])
+  items    InvoiceItem[]
+  payments Payment[]
+
+  @@unique([contractId, period])
+}
+
+enum InvoiceItemType {
+  RENT
+  ELECTRICITY
+  WATER
+  SERVICE
+  OTHER
+  DISCOUNT // Giảm trừ: amount âm
+}
+
+model InvoiceItem {
+  id          Int             @id @default(autoincrement())
+  invoiceId   Int
+  type        InvoiceItemType
+  description String // VD: "Điện: 1250 → 1380 (130 kWh)"
+  quantity    Float           @default(1)
+  unitPrice   Int
+  amount      Int
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER // Chủ nhà xác nhận thủ công
+  VIETQR // Tự động qua webhook
+}
+
+model Payment {
+  id             Int           @id @default(autoincrement())
+  invoiceId      Int
+  amount         Int
+  method         PaymentMethod
+  paidAt         DateTime      @default(now())
+  transactionRef String?       @unique // Mã giao dịch từ cổng thanh toán — @unique giúp chống ghi nhận 2 lần (idempotency)
+  rawPayload     Json? // Lưu nguyên dữ liệu webhook để tra cứu khi có tranh chấp
+  note           String?
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+}
+
+// ----------------------------------------------------------------------------- Sự cố, thông báo, push
+
+enum MaintenanceStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+  REJECTED
+}
+
+model MaintenanceRequest {
+  id          Int               @id @default(autoincrement())
+  roomId      Int
+  createdById Int
+  title       String
+  description String?
+  imageUrl    String?
+  status      MaintenanceStatus @default(OPEN)
+  createdAt   DateTime          @default(now())
+  resolvedAt  DateTime?
+
+  room      Room @relation(fields: [roomId], references: [id])
+  createdBy User @relation(fields: [createdById], references: [id])
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  title     String
+  body      String
+  link      String? // Đường dẫn trong app, VD "/portal/invoices/12"
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Đăng ký nhận Web Push của từng trình duyệt (1 người có thể có nhiều thiết bị)
+model PushSubscription {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

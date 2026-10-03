@@ -1,0 +1,457 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Lộ trình BTL Nhà trọ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Bố cục: lưới tuần × thành viên như một bảng phân ca; ô được chọn mở bảng chi tiết bên dưới */
+:root {
+  --bg: #f3f5f9;
+  --surface: #ffffff;
+  --surface-2: #eaeef5;
+  --fg: #18202c;
+  --muted: #5a6577;
+  --line: #d6dce6;
+  --accent: #2154d1;
+  --core: #2154d1;  --core-soft: #e4ebfb;
+  --adv: #b85a06;   --adv-soft: #fbecd9;
+  --opt: #3a7a4b;   --opt-soft: #e2f0e6;
+  --org: #687384;   --org-soft: #eceff4;
+  --mile: #b3262d;  --mile-soft: #fbe4e5;
+  --now: #fff6d6;
+  --font-display: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131a; --surface: #161d27; --surface-2: #1d2632; --fg: #e5eaf1; --muted: #95a1b4; --line: #2a3443;
+    --accent: #7fa3ff;
+    --core: #7fa3ff; --core-soft: #1b2847;
+    --adv: #f0a45c;  --adv-soft: #36260f;
+    --opt: #7cc590;  --opt-soft: #182e20;
+    --org: #a2abb8;  --org-soft: #232b36;
+    --mile: #ff7f86; --mile-soft: #3a1c1f;
+    --now: #2c2a18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131a; --surface: #161d27; --surface-2: #1d2632; --fg: #e5eaf1; --muted: #95a1b4; --line: #2a3443;
+  --accent: #7fa3ff;
+  --core: #7fa3ff; --core-soft: #1b2847;
+  --adv: #f0a45c;  --adv-soft: #36260f;
+  --opt: #7cc590;  --opt-soft: #182e20;
+  --org: #a2abb8;  --org-soft: #232b36;
+  --mile: #ff7f86; --mile-soft: #3a1c1f;
+  --now: #2c2a18;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; display: grid; gap: 22px; }
+@media (max-width: 600px) { .wrap { padding-inline: 16px; } }
+
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--font-display); font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0; font-weight: 700; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 68ch; }
+
+/* Thanh điều khiển */
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.ctl-group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ctl-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-right: 4px; }
+.pill {
+  font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+  padding: 5px 12px; border-radius: 999px;
+}
+.pill[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+select.pill { padding-right: 8px; }
+.pill:focus-visible, .task:focus-visible, .chain-btn:focus-visible, .dep:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Chú thích */
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 4px; border: 2px solid; display: inline-block; }
+.sw.core { background: var(--core-soft); border-color: var(--core); }
+.sw.adv  { background: var(--adv-soft);  border-color: var(--adv); }
+.sw.opt  { background: var(--opt-soft);  border-color: var(--opt); border-style: dashed; }
+.sw.org  { background: var(--org-soft);  border-color: var(--org); }
+.sw.need { background: transparent; border-color: var(--mile); border-style: dashed; }
+.sw.unlock { background: transparent; border-color: var(--accent); border-style: dotted; }
+
+/* Lưới lộ trình */
+.board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 1500px; }
+th, td { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); vertical-align: top; }
+tr > :last-child { border-right: none; }
+tbody tr:last-child > * { border-bottom: none; }
+
+.phase-row th { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 8px 10px; text-align: left; background: var(--surface-2); }
+.week-row th { padding: 8px 8px 10px; text-align: left; font-weight: 600; background: var(--surface); }
+.wk-num { font-family: var(--font-mono); font-size: 13px; }
+.wk-mile { display: block; margin-top: 4px; font-size: 11px; font-weight: 600; color: var(--mile); background: var(--mile-soft); border-radius: 4px; padding: 1px 6px; width: fit-content; }
+.wk-now { display: block; margin-top: 4px; font-size: 11px; font-weight: 700; color: var(--fg); }
+
+th.who, td.who {
+  position: sticky; left: 0; z-index: 2; background: var(--surface);
+  width: 150px; min-width: 150px; text-align: left; padding: 10px 12px;
+}
+td.who b { display: block; font-size: 14px; }
+td.who small { display: block; color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 2px; font-weight: 400; }
+
+td.cell { padding: 6px; min-width: 112px; }
+td.cell.is-now, th.is-now { background: var(--now); }
+tr.dim td.cell > * { opacity: .28; }
+tr.dim td.who { color: var(--muted); }
+
+.cell-stack { display: grid; gap: 6px; }
+.task {
+  font: inherit; text-align: left; cursor: pointer; width: 100%;
+  font-size: 12.5px; font-weight: 500; line-height: 1.3; color: var(--fg);
+  padding: 7px 8px; border-radius: 7px; border: 1.5px solid; position: relative;
+}
+.task.core { background: var(--core-soft); border-color: color-mix(in srgb, var(--core) 45%, transparent); }
+.task.adv  { background: var(--adv-soft);  border-color: color-mix(in srgb, var(--adv) 55%, transparent); }
+.task.opt  { background: var(--opt-soft);  border-color: color-mix(in srgb, var(--opt) 60%, transparent); border-style: dashed; }
+.task.org  { background: var(--org-soft);  border-color: color-mix(in srgb, var(--org) 40%, transparent); }
+.task:hover { border-color: var(--fg); }
+.task.is-selected { box-shadow: 0 0 0 2.5px var(--fg); border-color: var(--fg); }
+.task.is-need { outline: 2px dashed var(--mile); outline-offset: 2px; }
+.task.is-unlock { outline: 2px dotted var(--accent); outline-offset: 2px; }
+
+/* Chi tiết */
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; }
+@media (max-width: 760px) { .detail { grid-template-columns: 1fr; padding: 18px 16px; } }
+.detail h2 { font-size: 22px; margin: 4px 0 6px; line-height: 1.25; text-wrap: balance; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: var(--surface-2); color: var(--fg); }
+.tag.core { background: var(--core-soft); color: var(--core); }
+.tag.adv  { background: var(--adv-soft);  color: var(--adv); }
+.tag.opt  { background: var(--opt-soft);  color: var(--opt); }
+.tag.org  { background: var(--org-soft);  color: var(--org); }
+.sub { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 0 6px; }
+.detail ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+.out li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; }
+.out li::before { content: ""; width: 14px; height: 14px; margin-top: 4px; border: 1.5px solid var(--muted); border-radius: 3px; }
+.note { margin-top: 12px; font-size: 13.5px; padding: 8px 12px; border-radius: 8px; background: var(--mile-soft); color: var(--fg); }
+.deps { display: flex; flex-wrap: wrap; gap: 6px; }
+.dep { font: inherit; font-size: 12.5px; cursor: pointer; padding: 4px 9px; border-radius: 6px; background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); }
+.dep:hover { border-color: var(--fg); }
+.dep .w { font-family: var(--font-mono); color: var(--muted); margin-right: 4px; }
+.none { color: var(--muted); font-size: 13.5px; }
+.file { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+code { font-family: var(--font-mono); font-size: 13px; background: var(--surface-2); padding: 3px 7px; border-radius: 5px; overflow-wrap: anywhere; }
+.copy { font: inherit; font-size: 12px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 6px; padding: 3px 9px; }
+
+/* Chuỗi then chốt */
+.chain-box { display: grid; gap: 10px; }
+.chain-box h3 { margin: 0; font-size: 17px; }
+.chain-box p { margin: 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+.chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.chain-btn { font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; padding: 6px 10px; border-radius: 7px; border: 1.5px solid; color: var(--fg); }
+.chain-btn.core { background: var(--core-soft); border-color: color-mix(in srgb, var(--core) 45%, transparent); }
+.chain-btn.adv  { background: var(--adv-soft);  border-color: color-mix(in srgb, var(--adv) 55%, transparent); }
+.chain-btn .w { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin-right: 4px; }
+.arrow { color: var(--muted); font-size: 14px; }
+
+.hint { font-size: 13px; color: var(--muted); margin: -8px 0 0; }
+@media (prefers-reduced-motion: no-preference) { .task, .dep, .pill { transition: border-color .12s, box-shadow .12s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">BTL Công nghệ Web · Nhóm 4 người · 12 tuần</div>
+    <h1>Lộ trình hệ thống quản lý nhà cho thuê</h1>
+    <p class="lede">Mỗi hàng là một người, mỗi cột là một tuần. Bấm vào một ô để xem kết quả cần đạt, việc phải xong trước và trang hướng dẫn chi tiết trên Notion của nhóm.</p>
+  </header>
+
+  <div class="controls">
+    <div class="ctl-group" role="group" aria-label="Lọc theo người">
+      <span class="ctl-label">Xem</span>
+      <span id="who-filter"></span>
+    </div>
+    <div class="ctl-group">
+      <label class="ctl-label" for="now-week">Tuần hiện tại</label>
+      <select id="now-week" class="pill"></select>
+    </div>
+  </div>
+
+  <div class="legend" aria-label="Chú thích">
+    <span><i class="sw core"></i>MVP bắt buộc</span>
+    <span><i class="sw adv"></i>Công nghệ trọng tâm</span>
+    <span><i class="sw opt"></i>Nếu dư thời gian</span>
+    <span><i class="sw org"></i>Tổ chức, học, tài liệu</span>
+    <span><i class="sw need"></i>Cần xong trước</span>
+    <span><i class="sw unlock"></i>Mở đường cho</span>
+  </div>
+
+  <div class="board" id="board"></div>
+  <p class="hint">Trên điện thoại, vuốt ngang bảng để xem các tuần sau.</p>
+
+  <section class="detail" id="detail" aria-live="polite"></section>
+
+  <section class="chain-box">
+    <h3>Chuỗi việc then chốt</h3>
+    <p>Những việc này nối tiếp nhau: một khâu trễ sẽ kéo cả chuỗi phía sau trễ theo, nên trưởng nhóm cần theo sát nhất.</p>
+    <div class="chain" id="chain"></div>
+  </section>
+</div>
+
+<script>
+const PEOPLE = [
+  { id: 'all', name: 'Cả nhóm', role: 'Họp, kiểm thử, báo cáo' },
+  { id: 'TV1', name: 'TV1 · Trưởng nhóm', role: 'Phòng, Dịch vụ, Dashboard, Realtime' },
+  { id: 'TV2', name: 'TV2 · Tech lead', role: 'Khách thuê, Hợp đồng, Deploy, Thanh toán' },
+  { id: 'TV3', name: 'TV3 · Nghiệp vụ', role: 'Tính tiền, Chỉ số, Hóa đơn, Cron' },
+  { id: 'TV4', name: 'TV4 · Khách thuê', role: 'Sự cố, Thông báo, PWA, Push' },
+];
+const PHASES = [
+  { name: 'Thiết kế', from: 1, to: 2 },
+  { name: 'Xây MVP', from: 3, to: 7 },
+  { name: 'Công nghệ nâng cao', from: 8, to: 10 },
+  { name: 'Hoàn thiện và bảo vệ', from: 11, to: 12 },
+];
+const MILESTONES = { 2: 'Chốt thiết kế', 7: 'MVP chạy online', 11: 'Đóng băng', 12: 'Bảo vệ' };
+const PRIO = { core: 'MVP bắt buộc', adv: 'Công nghệ trọng tâm', opt: 'Nếu dư thời gian', org: 'Tổ chức, học, tài liệu' };
+
+const TASKS = [
+  // Tuần 1
+  { id: 'w1-all-a', w: 1, who: 'all', prio: 'org', name: 'Cài đặt, chạy khung', out: ['Mỗi người chạy được app trên máy mình, đăng nhập tài khoản demo', 'Thêm, sửa, xóa được một tòa nhà', 'Project đặt ngoài OneDrive'] },
+  { id: 'w1-all-b', w: 1, who: 'all', prio: 'org', name: 'Học nền, bài tập đọc hiểu', out: ['Nắm Git, JavaScript/TypeScript, React, REST cơ bản', 'Tự vẽ đường đi của thao tác “Thêm tòa nhà” qua các file', 'Thêm thử trường managerPhone trên nhánh practice (không merge)'] },
+  { id: 'w1-TV1', w: 1, who: 'TV1', prio: 'org', name: 'Tổ chức nhóm', out: ['Bảng phân công đã điền tên', 'GitHub Projects có issue tuần 1–2', 'Đã hỏi giáo viên tiêu chí chấm và hạn nộp', 'Đã hẹn 1–2 chủ trọ để khảo sát'] },
+  { id: 'w1-TV2', w: 1, who: 'TV2', prio: 'org', name: 'Tạo repo, hướng dẫn Git', out: ['Repo private có nhánh main, dev, đã bảo vệ nhánh', 'Buổi “Git 30 phút”: cả 4 người có 1 PR được merge', 'Mỗi người có database Neon riêng'] },
+  { id: 'w1-TV3', w: 1, who: 'TV3', prio: 'org', name: 'Câu hỏi khảo sát tính tiền', out: ['10–15 câu hỏi cho chủ trọ, lấy từ trang 03 Công thức tính tiền', 'Đã chạy npm test và đọc hiểu billing.ts'] },
+  { id: 'w1-TV4', w: 1, who: 'TV4', prio: 'org', name: 'Tìm hiểu PWA, giao diện mẫu', out: ['Ghi chú 1 trang về PWA gửi nhóm', 'Cài thử 2 PWA trên điện thoại', '5–10 ảnh giao diện tham khảo'] },
+  // Tuần 2
+  { id: 'w2-all', w: 2, who: 'all', prio: 'org', name: 'Khảo sát, họp chốt thiết kế', deps: ['w1-TV1', 'w1-TV3'], out: ['Trang Notion “Biên bản khảo sát”', '3 khó khăn lớn nhất của chủ trọ', 'Họp chốt: yêu cầu → tính tiền → ERD → API → wireframe'] },
+  { id: 'w2-TV1', w: 2, who: 'TV1', prio: 'org', name: 'Yêu cầu chức năng, wireframe', deps: ['w2-all'], out: ['Trang 02 Yêu cầu chức năng đã chốt, mỗi mục có tiêu chí chấp nhận', 'Sơ đồ use case cho 2 tác nhân', 'Wireframe Dashboard, Phòng, Sơ đồ phòng'] },
+  { id: 'w2-TV2', w: 2, who: 'TV2', prio: 'org', name: 'Review ERD, chốt API', out: ['schema.prisma v1 merge trước tuần 3', 'Trang 05 Danh sách API đủ cho mọi chức năng bắt buộc', 'Label và milestone trên GitHub'] },
+  { id: 'w2-TV3', w: 2, who: 'TV3', prio: 'core', name: 'Chốt công thức tính tiền', deps: ['w2-all'], out: ['Mọi ô “Quyết định của nhóm” trong trang 03 Công thức tính tiền đã điền', '5 ca kiểm thử tính tay, có người kiểm lại', 'Kết quả mong đợi điền vào các it.todo'], note: 'Chưa chốt công thức thì chưa sang tuần 3.' },
+  { id: 'w2-TV4', w: 2, who: 'TV4', prio: 'org', name: 'Wireframe cổng khách thuê', out: ['5 màn hình khổ điện thoại', 'Sơ đồ trạng thái yêu cầu sửa chữa', 'Danh sách các thông báo hệ thống sẽ gửi'] },
+  // Tuần 3
+  { id: 'w3-TV1', w: 3, who: 'TV1', prio: 'core', name: 'Module Phòng', deps: ['w2-TV2'], out: ['5 API /rooms, kiểm tra quyền qua building.ownerId', 'Trang Phòng lọc theo tòa nhà, Tag màu trạng thái', 'Tạo src/utils/status.ts dùng chung'] },
+  { id: 'w3-TV2', w: 3, who: 'TV2', prio: 'core', name: 'Khách thuê, cấp tài khoản', deps: ['w2-TV2'], out: ['CRUD khách thuê, tìm theo tên hoặc SĐT', 'POST /tenants/:id/account trong transaction', 'Khách đăng nhập được, vào thẳng /portal'] },
+  { id: 'w3-TV3', w: 3, who: 'TV3', prio: 'core', name: 'Hàm tính tiền, unit test', deps: ['w2-TV3'], out: ['Xong 3 hàm TODO trong billing.ts', 'buildInvoiceItems() cho một hợp đồng một kỳ', '≥ 20 test qua, ca 3.940.000đ đúng từng đồng'] },
+  { id: 'w3-TV4', w: 3, who: 'TV4', prio: 'core', name: 'Báo sự cố (phía khách)', deps: ['w2-TV4'], out: ['POST/GET /portal/maintenance, phòng lấy từ hợp đồng hiệu lực', 'Trang báo sự cố dùng tốt ở khổ 375px', 'Hàm dùng chung getActiveContractOfUser()'] },
+  // Tuần 4
+  { id: 'w4-TV1', w: 4, who: 'TV1', prio: 'core', name: 'Dịch vụ, chi tiết phòng', deps: ['w3-TV1'], out: ['CRUD dịch vụ với 3 kiểu tính', 'Dịch vụ đã dùng thì ẩn thay vì xóa', 'Trang /rooms/:id có hợp đồng hiện tại và 6 kỳ chỉ số'] },
+  { id: 'w4-TV2', w: 4, who: 'TV2', prio: 'core', name: 'Module Hợp đồng', deps: ['w3-TV1', 'w3-TV2'], out: ['Tạo hợp đồng trong transaction, phòng chuyển Đang thuê', 'Một phòng tối đa 1 hợp đồng ACTIVE', 'Kết thúc hợp đồng, phòng về Trống'] },
+  { id: 'w4-TV3', w: 4, who: 'TV3', prio: 'core', name: 'Chỉ số điện nước', deps: ['w3-TV1', 'w3-TV3'], out: ['Bảng chỉ số cả tòa nhà, chỉ số cũ tự gợi ý', 'PUT /meter-readings/bulk lưu hàng loạt', 'Báo lỗi chỉ số mới nhỏ hơn cũ, cảnh báo bất thường'] },
+  { id: 'w4-TV4', w: 4, who: 'TV4', prio: 'core', name: 'Xử lý sự cố, Thông báo', deps: ['w3-TV4'], out: ['Chủ nhà đổi trạng thái sự cố theo quy tắc', 'Hàm notify() dùng chung cho cả nhóm', 'Chuông thông báo ở cả 2 giao diện'] },
+  // Tuần 5
+  { id: 'w5-TV1', w: 5, who: 'TV1', prio: 'core', name: 'Sơ đồ phòng, tìm kiếm', deps: ['w4-TV1', 'w4-TV2'], out: ['Trang /room-map: phòng xếp theo tầng, màu theo trạng thái', 'Bấm ô phòng mở trang chi tiết phòng', 'Sắp xếp và tìm kiếm ở các bảng'] },
+  { id: 'w5-TV2', w: 5, who: 'TV2', prio: 'core', name: 'Chi tiết hợp đồng, bảo mật lần 1', deps: ['w4-TV2'], out: ['Sửa người ở, dịch vụ, người đại diện', 'Danh sách hợp đồng sắp hết hạn', 'Báo cáo kiểm tra bảo mật: chủ nhà B không đọc được dữ liệu chủ nhà A'] },
+  { id: 'w5-TV3', w: 5, who: 'TV3', prio: 'core', name: 'Tạo hóa đơn hàng loạt', deps: ['w3-TV3', 'w4-TV2', 'w4-TV3'], out: ['POST /invoices/generate tạo hóa đơn nháp', 'Chạy 2 lần không trùng, báo rõ phòng thiếu chỉ số', 'InvoiceStatusTag, InvoiceItemsTable dùng chung với TV4'] },
+  { id: 'w5-TV4', w: 5, who: 'TV4', prio: 'core', name: 'Cổng khách thuê', deps: ['w3-TV4', 'w5-TV3'], out: ['GET /portal/me và /portal/invoices', '4 trang: trang chủ, hóa đơn, chi tiết, hợp đồng', 'Đổi id trên URL sang hóa đơn người khác phải ra 404'] },
+  // Tuần 6
+  { id: 'w6-TV1', w: 6, who: 'TV1', prio: 'core', name: 'Dashboard', deps: ['w5-TV3'], out: ['GET /dashboard/summary: phòng trống, đã thu, còn phải thu', 'Danh sách 5 hóa đơn quá hạn', 'Số liệu khớp khi đếm tay'] },
+  { id: 'w6-TV2', w: 6, who: 'TV2', prio: 'core', name: 'Deploy lần 1', out: ['Frontend Vercel, backend Render, DB Neon production', 'F5 ở trang con không bị 404', 'Trang Notion “Hướng dẫn deploy”'] },
+  { id: 'w6-TV3', w: 6, who: 'TV3', prio: 'core', name: 'Phát hành và thu tiền', deps: ['w5-TV3', 'w4-TV4'], out: ['Sửa khoản khi còn nháp, tổng tính lại ở server', 'Phát hành → khách nhận thông báo', 'applyPayment() dùng chung cho webhook'] },
+  { id: 'w6-TV4', w: 6, who: 'TV4', prio: 'core', name: 'In hóa đơn, rà điện thoại', deps: ['w5-TV3'], out: ['Nút In / Lưu PDF dạng phiếu báo tiền', 'Rà mọi trang ở khổ 375px, giao lỗi cho người phụ trách'] },
+  // Tuần 7
+  { id: 'w7-all', w: 7, who: 'all', prio: 'core', name: 'Kiểm thử chéo, sửa lỗi', deps: ['w6-TV1', 'w6-TV2', 'w6-TV3', 'w6-TV4'], out: ['Mỗi người thử module của người khác ≥ 1 giờ', 'Lỗi ghi thành issue, nhãn bug', 'Hết thứ Sáu không còn lỗi chặn demo'], note: 'Tuần này không thêm tính năng mới.' },
+  { id: 'w7-TV1', w: 7, who: 'TV1', prio: 'org', name: 'Kịch bản demo, kiểm thử', out: ['Trang “Kịch bản demo” dài 5–7 phút', 'Trang “Kịch bản kiểm thử” ≥ 30 dòng', 'Biên bản họp rút kinh nghiệm'] },
+  { id: 'w7-TV2', w: 7, who: 'TV2', prio: 'core', name: 'Phát hành v0.5', deps: ['w6-TV2', 'w7-all'], out: ['PR dev → main, gắn tag v0.5', 'Bản online chạy hết kịch bản demo'] },
+  { id: 'w7-TV3', w: 7, who: 'TV3', prio: 'org', name: 'Dữ liệu demo thực tế', out: ['2 tòa nhà, ~12 phòng, 3 tháng hóa đơn đủ trạng thái', 'Seed lại bản online'] },
+  { id: 'w7-TV4', w: 7, who: 'TV4', prio: 'org', name: 'Rà soát trải nghiệm', out: ['Mọi trang có trạng thái rỗng và đang tải', 'Thử trên điện thoại thật'] },
+  // Tuần 8
+  { id: 'w8-TV1', w: 8, who: 'TV1', prio: 'opt', name: 'Biểu đồ, xuất Excel', deps: ['w6-TV1'], out: ['GET /dashboard/revenue cho 6 tháng', 'Biểu đồ cột Phát hành và Đã thu', 'Xuất CSV mở bằng Excel đúng tiếng Việt'] },
+  { id: 'w8-TV2', w: 8, who: 'TV2', prio: 'adv', name: 'VietQR trên hóa đơn', deps: ['w6-TV3', 'w5-TV4'], out: ['Chủ nhà khai báo tài khoản nhận tiền', 'Khách thấy mã QR, quét ra đúng số tiền và nội dung', 'Chốt nhà cung cấp webhook hoặc phương án giả lập'] },
+  { id: 'w8-TV3', w: 8, who: 'TV3', prio: 'adv', name: 'Job tự động (cron)', deps: ['w5-TV3', 'w4-TV4'], out: ['07:00 ngày 1 tự tạo hóa đơn nháp', '08:00 hằng ngày nhắc hóa đơn quá hạn', 'Nút “Chạy ngay” để demo, không tạo trùng'] },
+  { id: 'w8-TV4', w: 8, who: 'TV4', prio: 'adv', name: 'PWA', deps: ['w6-TV2'], out: ['Cài được lên điện thoại, có icon riêng', 'Mất mạng vẫn mở được khung app', 'Nút cài, hướng dẫn cho iPhone, thông báo cập nhật'] },
+  // Tuần 9
+  { id: 'w9-TV1', w: 9, who: 'TV1', prio: 'opt', name: 'Socket.IO realtime', deps: ['w4-TV4'], out: ['Kết nối socket bắt buộc có JWT', 'notify() phát sự kiện notification:new', 'Chuông nhảy ngay ở 2 cửa sổ'] },
+  { id: 'w9-TV2', w: 9, who: 'TV2', prio: 'adv', name: 'Webhook tự gạch nợ', deps: ['w8-TV2', 'w6-TV3'], out: ['Xác thực khóa bí mật hoặc chữ ký', 'Idempotency: gửi trùng không ghi nhận đôi', 'Chuyển khoản → hóa đơn tự Đã thanh toán'] },
+  { id: 'w9-TV3', w: 9, who: 'TV3', prio: 'core', name: 'Ghi số trên điện thoại', deps: ['w8-TV3', 'w4-TV3'], out: ['Link thông báo mở đúng trang của khách', 'Chế độ “đi ghi số” mỗi lần một phòng', 'Cùng TV2 thử trả thiếu, trả thừa, trả 2 lần'] },
+  { id: 'w9-TV4', w: 9, who: 'TV4', prio: 'adv', name: 'Web Push', deps: ['w8-TV4', 'w4-TV4'], out: ['Nút “Bật thông báo”, lưu đăng ký', 'notify() gửi push, kể cả khi đã đóng tab', 'Bấm thông báo mở đúng trang'] },
+  // Tuần 10
+  { id: 'w10-all', w: 10, who: 'all', prio: 'org', name: 'Tập vấn đáp theo cặp', out: ['15 phút mỗi buổi họp, hỏi chéo phần của nhau', 'Dùng bộ câu hỏi trong trang 08 Vấn đáp và báo cáo'] },
+  { id: 'w10-TV1', w: 10, who: 'TV1', prio: 'opt', name: 'Tích hợp realtime', deps: ['w9-TV1', 'w9-TV2'], out: ['invoice:paid cập nhật hóa đơn ngay lập tức', 'maintenance:new báo chủ nhà', 'Video demo realtime dự phòng'] },
+  { id: 'w10-TV2', w: 10, who: 'TV2', prio: 'core', name: 'Bảo mật lần 2', deps: ['w9-TV2'], out: ['Giới hạn số lần đăng nhập sai', 'Đổi mật khẩu, đặt lại mật khẩu cho khách', 'Webhook chạy trên bản online'] },
+  { id: 'w10-TV3', w: 10, who: 'TV3', prio: 'opt', name: 'Ghi chỉ số offline', deps: ['w9-TV3', 'w8-TV4'], out: ['Mất mạng vẫn lưu tạm trên máy (IndexedDB)', 'Có mạng thì tự đồng bộ, xử lý xung đột', 'Hoặc thay bằng hóa đơn tất toán khi trả phòng'] },
+  { id: 'w10-TV4', w: 10, who: 'TV4', prio: 'adv', name: 'Hoàn thiện PWA', deps: ['w9-TV4'], out: ['Xem hóa đơn đã tải khi mất mạng', 'Đăng xuất xóa cache dữ liệu cá nhân', 'Lighthouse ≥ 90'] },
+  // Tuần 11
+  { id: 'w11-all', w: 11, who: 'all', prio: 'core', name: 'Kiểm thử vòng 2, viết báo cáo', out: ['Chạy lại Kịch bản kiểm thử trên bản online, đổi cặp', 'Mỗi người nộp phần báo cáo của mình trước thứ Năm', 'Không thêm tính năng mới'], note: 'Tính năng còn dở thì ẩn đi và ghi vào mục Hạn chế.' },
+  { id: 'w11-TV1', w: 11, who: 'TV1', prio: 'org', name: 'Tổng hợp báo cáo', deps: ['w11-all'], out: ['Báo cáo đủ chương, có mục lục tự động', 'Phụ lục đóng góp của từng người'] },
+  { id: 'w11-TV2', w: 11, who: 'TV2', prio: 'org', name: 'Dọn code, README, v1.0-rc', out: ['Hết TODO thừa, build không cảnh báo', 'README có link bản online', 'Deploy bản cuối, tag v1.0-rc'] },
+  { id: 'w11-TV3', w: 11, who: 'TV3', prio: 'org', name: 'Báo cáo kiểm thử, seed cuối', out: ['Ảnh kết quả test và độ bao phủ', 'Viết chương Kiểm thử', '1 hóa đơn chưa trả dành cho demo QR'] },
+  { id: 'w11-TV4', w: 11, who: 'TV4', prio: 'org', name: 'Ảnh chụp, video dự phòng', out: ['Bộ ảnh máy tính và điện thoại', 'Ảnh Lighthouse', 'Video demo 5–7 phút'] },
+  // Tuần 12
+  { id: 'w12-all', w: 12, who: 'all', prio: 'core', name: 'Slide, tập demo, bảo vệ', deps: ['w11-TV1', 'w11-TV4', 'w11-TV2'], out: ['Slide 12–15 trang, mỗi người làm phần mình', 'Tập trình bày 2 lần có bấm giờ', 'Mỗi người luyện vấn đáp ≥ 2 buổi', 'Tag v1.0, nộp đúng yêu cầu giáo viên'] },
+];
+
+const CHAIN = ['w3-TV2', 'w4-TV2', 'w4-TV3', 'w5-TV3', 'w6-TV3', 'w8-TV2', 'w9-TV2', 'w12-all'];
+
+const byId = Object.fromEntries(TASKS.map((t) => [t.id, t]));
+const unlocks = {};
+TASKS.forEach((t) => (t.deps || []).forEach((d) => (unlocks[d] = unlocks[d] || []).push(t.id)));
+const personName = (id) => PEOPLE.find((p) => p.id === id).name;
+const weekFile = (w) => `Notion › Kế hoạch 12 tuần › Tuần ${String(w).padStart(2, '0')}`;
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+
+let selected = null;
+let whoFilter = 'everyone';
+let nowWeek = Number(store.get('nowWeek')) || 0;
+
+function renderBoard() {
+  const weeks = Array.from({ length: 12 }, (_, i) => i + 1);
+  let html = '<table><thead><tr class="phase-row"><th class="who"></th>';
+  PHASES.forEach((p) => (html += `<th colspan="${p.to - p.from + 1}">${p.name}</th>`));
+  html += '</tr><tr class="week-row"><th class="who"></th>';
+  weeks.forEach((w) => {
+    html += `<th class="${w === nowWeek ? 'is-now' : ''}"><span class="wk-num">Tuần ${w}</span>`;
+    if (MILESTONES[w]) html += `<span class="wk-mile">Mốc · ${MILESTONES[w]}</span>`;
+    if (w === nowWeek) html += '<span class="wk-now">▲ Tuần này</span>';
+    html += '</th>';
+  });
+  html += '</tr></thead><tbody>';
+  PEOPLE.forEach((p) => {
+    const dim = whoFilter !== 'everyone' && whoFilter !== p.id && p.id !== 'all';
+    html += `<tr class="${dim ? 'dim' : ''}"><td class="who"><b>${p.name}</b><small>${p.role}</small></td>`;
+    weeks.forEach((w) => {
+      const tasks = TASKS.filter((t) => t.w === w && t.who === p.id);
+      html += `<td class="cell ${w === nowWeek ? 'is-now' : ''}"><div class="cell-stack">`;
+      tasks.forEach((t) => (html += `<button type="button" class="task ${t.prio}" data-id="${t.id}" aria-label="Tuần ${w}, ${esc(p.name)}: ${esc(t.name)}">${esc(t.name)}</button>`));
+      html += '</div></td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  const board = document.getElementById('board');
+  const scroll = board.scrollLeft;
+  board.innerHTML = html;
+  board.scrollLeft = scroll;
+  board.querySelectorAll('.task').forEach((b) => b.addEventListener('click', () => select(b.dataset.id)));
+  paintSelection();
+}
+
+function paintSelection() {
+  const t = byId[selected];
+  const needs = new Set(t?.deps || []);
+  const opens = new Set(unlocks[selected] || []);
+  document.querySelectorAll('.task').forEach((b) => {
+    b.classList.toggle('is-selected', b.dataset.id === selected);
+    b.classList.toggle('is-need', needs.has(b.dataset.id));
+    b.classList.toggle('is-unlock', opens.has(b.dataset.id));
+  });
+}
+
+function depButtons(ids) {
+  if (!ids.length) return '<span class="none">Không có</span>';
+  return '<div class="deps">' + ids.map((id) => {
+    const d = byId[id];
+    return `<button type="button" class="dep" data-id="${id}"><span class="w">T${d.w}</span>${esc(d.name)} · ${d.who === 'all' ? 'Cả nhóm' : d.who}</button>`;
+  }).join('') + '</div>';
+}
+
+function renderDetail() {
+  const t = byId[selected];
+  const el = document.getElementById('detail');
+  el.innerHTML = `
+    <div>
+      <div class="meta">
+        <span class="tag">Tuần ${t.w}</span>
+        <span class="tag">${esc(personName(t.who))}</span>
+        <span class="tag ${t.prio}">${PRIO[t.prio]}</span>
+      </div>
+      <h2>${esc(t.name)}</h2>
+      <div class="sub">Kết quả cần đạt</div>
+      <ul class="out">${t.out.map((o) => `<li><span>${esc(o)}</span></li>`).join('')}</ul>
+      ${t.note ? `<div class="note">${esc(t.note)}</div>` : ''}
+    </div>
+    <div>
+      <div class="sub" style="margin-top:4px">Cần xong trước</div>
+      ${depButtons(t.deps || [])}
+      <div class="sub">Mở đường cho</div>
+      ${depButtons(unlocks[t.id] || [])}
+      <div class="sub">Hướng dẫn chi tiết, checklist (trên Notion)</div>
+      <div class="file"><code id="file-path">${weekFile(t.w)}</code><button type="button" class="copy" id="copy-btn">Sao chép</button></div>
+    </div>`;
+  el.querySelectorAll('.dep').forEach((b) => b.addEventListener('click', () => select(b.dataset.id, true)));
+  document.getElementById('copy-btn').addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    const text = document.getElementById('file-path').textContent;
+    const done = () => { btn.textContent = 'Đã sao chép'; setTimeout(() => (btn.textContent = 'Sao chép'), 1500); };
+    try {
+      navigator.clipboard.writeText(text).then(done, () => selectText());
+    } catch { selectText(); }
+  });
+}
+
+function selectText() {
+  const range = document.createRange();
+  range.selectNodeContents(document.getElementById('file-path'));
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function select(id, scrollToCell) {
+  if (!byId[id]) return;
+  selected = id;
+  paintSelection();
+  renderDetail();
+  if (scrollToCell) {
+    const cell = document.querySelector(`.task[data-id="${id}"]`);
+    cell?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+}
+
+function renderFilters() {
+  const opts = [{ id: 'everyone', label: 'Tất cả' }, ...PEOPLE.filter((p) => p.id !== 'all').map((p) => ({ id: p.id, label: p.id }))];
+  const box = document.getElementById('who-filter');
+  box.className = 'ctl-group';
+  box.innerHTML = opts.map((o) => `<button type="button" class="pill" data-who="${o.id}" aria-pressed="${o.id === whoFilter}">${o.label}</button>`).join('');
+  box.querySelectorAll('.pill').forEach((b) => b.addEventListener('click', () => {
+    whoFilter = b.dataset.who;
+    box.querySelectorAll('.pill').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    renderBoard();
+  }));
+}
+
+function renderWeekSelect() {
+  const s = document.getElementById('now-week');
+  s.innerHTML = '<option value="0">Chưa chọn</option>' + Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">Tuần ${i + 1}</option>`).join('');
+  s.value = String(nowWeek);
+  s.addEventListener('change', () => {
+    nowWeek = Number(s.value);
+    store.set('nowWeek', String(nowWeek));
+    renderBoard();
+    if (nowWeek) {
+      const first = TASKS.find((t) => t.w === nowWeek && (whoFilter === 'everyone' || t.who === whoFilter)) || TASKS.find((t) => t.w === nowWeek);
+      if (first) select(first.id, true);
+    }
+  });
+}
+
+function renderChain() {
+  const el = document.getElementById('chain');
+  el.innerHTML = CHAIN.map((id, i) => {
+    const t = byId[id];
+    return (i ? '<span class="arrow" aria-hidden="true">→</span>' : '') +
+      `<button type="button" class="chain-btn ${t.prio}" data-id="${id}"><span class="w">T${t.w}</span>${esc(t.name)}</button>`;
+  }).join('');
+  el.querySelectorAll('.chain-btn').forEach((b) => b.addEventListener('click', () => select(b.dataset.id, true)));
+}
+
+renderFilters();
+renderWeekSelect();
+renderChain();
+const fromHash = location.hash.slice(1);
+selected = byId[fromHash] ? fromHash : (nowWeek && TASKS.find((t) => t.w === nowWeek)?.id) || 'w5-TV3';
+renderBoard();
+renderDetail();
+</script>
+
+</body></html>
