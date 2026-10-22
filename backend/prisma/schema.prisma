@@ -117,7 +117,7 @@ model Service {
 
 model Tenant {
   id          Int       @id @default(autoincrement())
-  ownerId     Int // Chủ nhà quản lý khách này
+  ownerId     Int       // Chủ nhà quản lý khách này
   userId      Int?      @unique // Tài khoản đăng nhập cổng khách thuê (có thể chưa tạo)
   fullName    String
   phone       String

@@ -39,3 +39,27 @@ export type BuildingInput = Pick<
 > & { description?: string };
 
 // TODO: thêm Room, Tenant, Contract, MeterReading, Invoice... khi làm các module tương ứng
+
+export type Tenant = {
+  id: number;
+  ownerId: number;
+  userId: number | null;
+  fullName: string;
+  phone: string;
+  email: string | null;
+  idNumber: string | null;
+  dateOfBirth: string | null; // Trả về từ API thường là string ISO
+  hometown: string | null;
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Dữ liệu gửi lên khi tạo/sửa (không có id, ownerId, userId, createdAt...)
+export type TenantInput = Pick<Tenant, 'fullName' | 'phone'> & {
+  email?: string | null;
+  idNumber?: string | null;
+  dateOfBirth?: string | null;
+  hometown?: string | null;
+  note?: string | null;
+};
