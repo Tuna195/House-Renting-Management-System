@@ -38,4 +38,53 @@ export type BuildingInput = Pick<
   'name' | 'address' | 'electricityPrice' | 'waterPrice' | 'waterBillingType' | 'invoiceDueDay'
 > & { description?: string };
 
-// TODO: thêm Room, Tenant, Contract, MeterReading, Invoice... khi làm các module tương ứng
+// -----------------------------------------------------------------------------
+// TV4 — SỰ CỐ & CỔNG KHÁCH THUÊ
+// -----------------------------------------------------------------------------
+
+export type MaintenanceStatus = 'OPEN' | 'IN_PROGRESS' | 'DONE' | 'REJECTED';
+
+export interface MaintenanceRequest {
+  id: number;
+  roomId: number;
+  createdById: number;
+  title: string;
+  description: string | null;
+  imageUrl: string | null;
+  status: MaintenanceStatus;
+  createdAt: string;
+  resolvedAt: string | null;
+  room?: {
+    id: number;
+    name: string;
+    building?: { id: number; name: string; address?: string };
+  };
+}
+
+export interface CreateMaintenanceInput {
+  title: string;
+  description?: string;
+  imageUrl?: string;
+}
+
+export interface ActiveContract {
+  id: number;
+  roomId: number;
+  startDate: string;
+  endDate: string | null;
+  rentPrice: number;
+  status: 'ACTIVE' | 'ENDED' | 'CANCELLED';
+  room: {
+    id: number;
+    name: string;
+    floor?: number | null;
+    area?: number | null;
+    building: {
+      id: number;
+      name: string;
+      address: string;
+    };
+  };
+}
+
+
