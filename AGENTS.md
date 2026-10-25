@@ -14,6 +14,7 @@
 - MUST sửa nguyên nhân, cập nhật tài liệu khi hành vi/API/schema đổi và chạy kiểm tra tương ứng. Không refactor, đổi stack hoặc thêm dependency ngoài nhu cầu nhiệm vụ.
 - MUST NEVER ghi đè công việc người dùng, dùng reset/clean/force-push để giải quyết xung đột, hoặc bỏ qua giới hạn công cụ.
 - Commit/push/merge, deploy, gửi thông điệp và thao tác phá hủy cần được ủy quyền. Khi được giao Git workflow: PR vào `dev`, không push trực tiếp `main`/`dev`; theo `docs/06-git-workflow.md` và quy tắc nhánh của phiên làm việc.
+- Git guidance cho toàn dự án: mỗi nhiệm vụ dùng nhánh `feature/...` hoặc `fix/...`, cập nhật từ `dev`, mở PR vào `dev`, cần ít nhất một approval rồi người được giao squash merge. Chỉ merge `dev` vào `main` ở mốc tuần 7, 11, 12; không force-push `main`/`dev`. Chi tiết và mẫu lệnh ở `docs/06-git-workflow.md`.
 
 </workflow>
 

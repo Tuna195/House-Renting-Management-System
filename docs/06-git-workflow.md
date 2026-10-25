@@ -1,7 +1,11 @@
 # Quy trình Git của nhóm
 
+Hướng dẫn Git áp dụng cho toàn dự án và mọi thành viên. Khi dùng agent, xem thêm
+[`AGENTS.md`](../AGENTS.md); việc lưu hướng dẫn không tự cấp quyền commit, push hoặc merge.
+
 ## Các nhánh
-```
+
+```text
 main      ← bản ổn định để nộp và demo. Chỉ merge từ dev ở các mốc (tuần 7, 11, 12)
   └─ dev  ← bản tích hợp hằng ngày. Mọi PR merge vào đây
        ├─ feature/rooms          (TV1)
@@ -11,6 +15,10 @@ main      ← bản ổn định để nộp và demo. Chỉ merge từ dev ở 
 ```
 
 ## Làm một nhiệm vụ: 7 bước
+
+Các lệnh dưới đây chạy từ thư mục gốc dự án. Kiểm tra `git status` trước khi đổi nhánh;
+giữ lại công việc đang làm và chỉ stage các file thuộc nhiệm vụ, không đưa `.env` vào commit.
+
 ```bash
 # 1. Cập nhật dev mới nhất
 git checkout dev
@@ -34,6 +42,9 @@ git push -u origin feature/rooms
 # 7. Được duyệt → TV2 (hoặc người được duyệt) bấm "Squash and merge" → xóa nhánh
 ```
 
+PR cần ít nhất một approval. Trước khi mở PR, chạy các kiểm tra theo
+[`AGENTS.md`](../AGENTS.md), gồm typecheck/build package bị ảnh hưởng và unit backend nếu đổi logic backend.
+
 ## Lấy code mới của người khác trong lúc đang làm
 Nên làm mỗi ngày để tránh conflict lớn:
 ```bash
@@ -41,7 +52,16 @@ git checkout dev && git pull
 git checkout feature/rooms
 git merge dev
 ```
-Sau đó chạy lại `npm install` (nếu `package.json` đổi) và `npm run db:migrate` (nếu có migration mới).
+Sau đó cài lại dependencies của package bị đổi theo lockfile:
+
+```bash
+# Chỉ chạy cho package có package.json hoặc package-lock.json thay đổi
+npm --prefix backend ci
+npm --prefix frontend ci
+```
+
+Nếu có migration mới, xác nhận cấu hình trỏ tới DB phát triển riêng rồi chạy
+`npm --prefix backend run db:migrate`. Không chạy migration trên DB production hoặc DB dùng chung.
 
 ## Gặp conflict (xung đột)
 1. VS Code tô màu chỗ xung đột: **Current** (của mình) và **Incoming** (của người khác)
@@ -89,3 +109,5 @@ Sau đó chạy lại `npm install` (nếu `package.json` đổi) và `npm run d
 > ⚠️ **Không dùng** `git push --force` trên `dev` hay `main`.
 
 **Học Git trong 1 buổi:** https://learngitbranching.js.org/?locale=vi (làm phần "Main" mục 1–4)
+
+**Ghi chú công việc:** `[day/memberID]`.
