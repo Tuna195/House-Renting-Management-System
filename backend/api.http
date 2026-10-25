@@ -44,7 +44,6 @@ Content-Type: application/json
 
 { "name": "", "electricityPrice": -1 }
 
-<<<<<<< HEAD
 # ============================================================================ PHÒNG (TV1)
 
 ### Danh sách phòng (tất cả tòa nhà của mình)
@@ -138,7 +137,6 @@ Content-Type: application/json
 ### Danh sách phòng của B → mảng rỗng
 GET {{baseUrl}}/rooms
 Authorization: Bearer {{tokenB}}
-=======
 ### =============================================================================
 ### TV4 — CỔNG KHÁCH THUÊ (PORTAL) & BÁO SỰ CỐ
 ### =============================================================================
@@ -167,4 +165,3 @@ Content-Type: application/json
   "description": "Vòi bị rỉ nước liên tục từ tối qua, vặn chặt van vẫn nhỏ giọt. Nhờ chủ nhà gọi thợ qua sớm giúp mình."
 }
 
->>>>>>> feature/portal-maintenance

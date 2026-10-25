@@ -38,7 +38,6 @@ export type BuildingInput = Pick<
   'name' | 'address' | 'electricityPrice' | 'waterPrice' | 'waterBillingType' | 'invoiceDueDay'
 > & { description?: string };
 
-<<<<<<< HEAD
 // TODO: thêm Room, Tenant, Contract, MeterReading, Invoice... khi làm các module tương ứng
 
 export type Tenant = {
@@ -88,7 +87,6 @@ export type RoomInput = Pick<Room, 'buildingId' | 'name' | 'baseRent' | 'maxOccu
 export type RoomUpdateInput = Partial<Omit<RoomInput, 'buildingId'>> & { status?: Exclude<RoomStatus, 'OCCUPIED'> };
 
 // TODO: thêm Tenant, Contract, MeterReading, Invoice... khi làm các module tương ứng
-=======
 // -----------------------------------------------------------------------------
 // TV4 — SỰ CỐ & CỔNG KHÁCH THUÊ
 // -----------------------------------------------------------------------------
@@ -137,6 +135,3 @@ export interface ActiveContract {
     };
   };
 }
-
-
->>>>>>> feature/portal-maintenance

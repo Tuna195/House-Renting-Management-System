@@ -15,12 +15,9 @@ api.get('/health', (_req, res) => {
 
 api.use('/auth', authRoutes);
 api.use('/buildings', buildingRoutes);
-<<<<<<< HEAD
 api.use('/tenants', tenantRoutes);
 api.use('/rooms', roomRoutes);
-=======
 api.use('/portal', portalRoutes); // TV4 — Tuần 3 (Cổng khách thuê: Báo sự cố, Tuần 5 thêm HĐ, hóa đơn)
->>>>>>> feature/portal-maintenance
 
 // TODO — các module sẽ thêm (xem docs/05-api.md để biết ai phụ trách):
 // api.use('/services', serviceRoutes);            // TV1 — Tuần 4
