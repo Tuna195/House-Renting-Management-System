@@ -77,9 +77,9 @@ Ghi quyết định thẳng vào các file docs, commit qua PR.
 **Gợi ý thiết kế điện thoại:** nút bấm to, thông tin quan trọng nhất (số tiền, hạn đóng) to và ở trên; dùng `Card` và `List` của Ant Design thay cho `Table` (bảng rất khó xem trên điện thoại).
 
 **Checklist**
-- [ ] Wireframe 5 màn hình điện thoại
-- [ ] Sơ đồ trạng thái sự cố
-- [ ] Danh sách thông báo
+- [x] Wireframe 5 màn hình điện thoại ([wireframe-tv4-khach-thue.excalidraw](../wireframes/wireframe-tv4-khach-thue.excalidraw) & [wireframe-preview.html](../wireframes/wireframe-preview.html))
+- [x] Sơ đồ trạng thái sự cố ([so-do-trang-thai-su-co.svg](../images/so-do-trang-thai-su-co.svg) & [so-do-luong-su-co.md](../so-do-luong-su-co.md))
+- [x] Danh sách thông báo (đã tích hợp trong [so-do-luong-su-co.md](../so-do-luong-su-co.md))
 
 ---
 

@@ -51,3 +51,11 @@
 
 ## Ngoài phạm vi (KHÔNG làm, tránh lan man)
 - App di động native; nhiều người quản lý một tòa nhà; kế toán và thuế; hợp đồng điện tử có chữ ký số; đăng tin cho thuê và tìm phòng
+
+---
+
+## 📚 Tài liệu phân tích và thiết kế chi tiết (Tuần 2)
+- Wireframe cổng khách thuê (TV4): [`docs/wireframes/README.md`](wireframes/README.md) & [Bản xem trực tiếp](wireframes/wireframe-preview.html)
+- Luồng sự cố & Sơ đồ trạng thái (TV4): [`docs/so-do-luong-su-co.md`](so-do-luong-su-co.md)
+- Danh mục và kiến trúc thông báo đa kênh (TV4): [`docs/danh-sach-thong-bao.md`](danh-sach-thong-bao.md)
+
