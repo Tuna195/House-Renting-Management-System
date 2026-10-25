@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './modules/auth/auth.routes';
 import buildingRoutes from './modules/buildings/buildings.routes';
+import roomRoutes from './modules/rooms/rooms.routes';
 
 // Nơi gắn tất cả các module vào /api. Thêm module mới thì thêm 1 dòng ở đây.
 const api = Router();
@@ -11,9 +12,9 @@ api.get('/health', (_req, res) => {
 
 api.use('/auth', authRoutes);
 api.use('/buildings', buildingRoutes);
+api.use('/rooms', roomRoutes);
 
 // TODO — các module sẽ thêm (xem docs/05-api.md để biết ai phụ trách):
-// api.use('/rooms', roomRoutes);                  // TV1 — Tuần 3
 // api.use('/services', serviceRoutes);            // TV1 — Tuần 4
 // api.use('/tenants', tenantRoutes);              // TV2 — Tuần 3
 // api.use('/contracts', contractRoutes);          // TV2 — Tuần 4

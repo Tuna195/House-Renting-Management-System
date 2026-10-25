@@ -1,6 +1,7 @@
 import { Form, Input, InputNumber, Modal, Radio } from 'antd';
 import { useEffect } from 'react';
 import type { Building, BuildingInput } from '../../types';
+import { moneyFormatter, moneyParser } from '../../utils/format';
 
 interface Props {
   open: boolean;
@@ -9,10 +10,6 @@ interface Props {
   onCancel: () => void;
   onSubmit: (values: BuildingInput) => void;
 }
-
-// Hiển thị số tiền có dấu chấm ngăn cách: 3500000 → 3.500.000
-const moneyFormatter = (v: number | string | undefined) => `${v ?? ''}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-const moneyParser = (v: string | undefined) => Number((v ?? '').replace(/\./g, ''));
 
 export function BuildingFormModal({ open, initialValues, submitting, onCancel, onSubmit }: Props) {
   const [form] = Form.useForm<BuildingInput>();
