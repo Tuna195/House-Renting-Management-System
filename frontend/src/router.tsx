@@ -3,6 +3,8 @@ import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
 import { RequireAuth } from './features/auth/RequireAuth';
 import BuildingsPage from './features/buildings/BuildingsPage';
+import TenantsPage from './features/tenants/TenantsPage';
+import RoomsPage from './features/rooms/RoomsPage';
 import { AppLayout } from './layouts/AppLayout';
 import { landlordNav, tenantNav, type NavItem } from './navigation';
 import ComingSoonPage from './pages/ComingSoonPage';
@@ -29,7 +31,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardPage /> },
       { path: 'buildings', element: <BuildingsPage /> },
+      { path: 'tenants', element: <TenantsPage /> },
       // Thêm trang thật ở đây, VD: { path: 'rooms', element: <RoomsPage /> },
+      { path: 'rooms', element: <RoomsPage /> },
+      // Thêm trang thật ở đây
       ...comingSoonRoutes(landlordNav),
     ],
   },

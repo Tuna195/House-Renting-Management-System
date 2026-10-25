@@ -5,6 +5,10 @@ const vnd = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' 
 /** 3500000 → "3.500.000 ₫" */
 export const formatVND = (amount: number) => vnd.format(amount);
 
+/** Cho InputNumber nhập tiền: hiển thị 3500000 → "3.500.000", đọc lại "3.500.000" → 3500000 */
+export const moneyFormatter = (v: number | string | undefined) => `${v ?? ''}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+export const moneyParser = (v: string | undefined) => Number((v ?? '').replace(/\./g, ''));
+
 /** "2026-10-03T..." → "03/10/2026" */
 export const formatDate = (value: string | Date) => dayjs(value).format('DD/MM/YYYY');
 

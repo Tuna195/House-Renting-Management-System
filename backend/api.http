@@ -43,3 +43,97 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "name": "", "electricityPrice": -1 }
+
+# ============================================================================ PHÒNG (TV1)
+
+### Danh sách phòng (tất cả tòa nhà của mình)
+GET {{baseUrl}}/rooms
+Authorization: Bearer {{token}}
+
+### Lọc theo tòa nhà và trạng thái
+GET {{baseUrl}}/rooms?buildingId=1&status=VACANT
+Authorization: Bearer {{token}}
+
+### Tham số lọc sai → 400
+GET {{baseUrl}}/rooms?buildingId=abc&status=XYZ
+Authorization: Bearer {{token}}
+
+### Chi tiết phòng (kèm hợp đồng đang hiệu lực, nếu có)
+GET {{baseUrl}}/rooms/1
+Authorization: Bearer {{token}}
+
+### Tạo phòng
+# @name createRoom
+POST {{baseUrl}}/rooms
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "buildingId": 1,
+  "name": "P401",
+  "floor": 4,
+  "area": 22.5,
+  "baseRent": 3800000,
+  "maxOccupants": 3
+}
+
+### Trùng tên phòng trong cùng tòa nhà → 409 "Tên phòng đã tồn tại trong tòa nhà này"
+POST {{baseUrl}}/rooms
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "buildingId": 1, "name": "P101", "baseRent": 3000000 }
+
+### Sửa phòng (buildingId gửi lên sẽ bị bỏ qua, không chuyển được tòa nhà)
+PATCH {{baseUrl}}/rooms/{{createRoom.response.body.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "baseRent": 4000000, "status": "MAINTENANCE" }
+
+### Xóa phòng vừa tạo → 204
+DELETE {{baseUrl}}/rooms/{{createRoom.response.body.id}}
+Authorization: Bearer {{token}}
+
+### Xóa phòng đã từng có hợp đồng (P101 trong seed) → 409
+DELETE {{baseUrl}}/rooms/1
+Authorization: Bearer {{token}}
+
+### --- Kiểm tra bảo mật: chủ nhà B không đụng được phòng của chủ nhà A ---
+### Đăng ký chủ nhà B (chạy 1 lần; lần sau báo trùng email thì bỏ qua)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "email": "chunha-b@demo.vn", "password": "123456", "fullName": "Chủ nhà B" }
+
+### Đăng nhập chủ nhà B
+# @name loginB
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "chunha-b@demo.vn", "password": "123456" }
+
+###
+@tokenB = {{loginB.response.body.token}}
+
+### B xem phòng 1 của A → 404
+GET {{baseUrl}}/rooms/1
+Authorization: Bearer {{tokenB}}
+
+### B sửa phòng 1 của A → 404
+PATCH {{baseUrl}}/rooms/1
+Authorization: Bearer {{tokenB}}
+Content-Type: application/json
+
+{ "baseRent": 1 }
+
+### B tạo phòng vào tòa nhà 1 của A → 404 "Không tìm thấy tòa nhà"
+POST {{baseUrl}}/rooms
+Authorization: Bearer {{tokenB}}
+Content-Type: application/json
+
+{ "buildingId": 1, "name": "P999", "baseRent": 1000000 }
+
+### Danh sách phòng của B → mảng rỗng
+GET {{baseUrl}}/rooms
+Authorization: Bearer {{tokenB}}
