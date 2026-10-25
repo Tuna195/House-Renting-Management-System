@@ -38,4 +38,27 @@ export type BuildingInput = Pick<
   'name' | 'address' | 'electricityPrice' | 'waterPrice' | 'waterBillingType' | 'invoiceDueDay'
 > & { description?: string };
 
-// TODO: thêm Room, Tenant, Contract, MeterReading, Invoice... khi làm các module tương ứng
+export type RoomStatus = 'VACANT' | 'OCCUPIED' | 'MAINTENANCE';
+
+export interface Room {
+  id: number;
+  buildingId: number;
+  name: string;
+  floor: number | null;
+  area: number | null;
+  baseRent: number;
+  maxOccupants: number;
+  status: RoomStatus;
+  createdAt: string;
+  building?: Pick<Building, 'id' | 'name'>;
+}
+
+export type RoomInput = Pick<Room, 'buildingId' | 'name' | 'baseRent' | 'maxOccupants'> & {
+  floor?: number | null;
+  area?: number | null;
+};
+
+// Khi sửa: không đổi được tòa nhà; trạng thái chỉ đổi tay giữa Trống ↔ Sửa chữa
+export type RoomUpdateInput = Partial<Omit<RoomInput, 'buildingId'>> & { status?: Exclude<RoomStatus, 'OCCUPIED'> };
+
+// TODO: thêm Tenant, Contract, MeterReading, Invoice... khi làm các module tương ứng
