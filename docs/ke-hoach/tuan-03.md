@@ -158,10 +158,10 @@
 - Ảnh đính kèm (chụp chỗ hỏng) là 🟢, để sau
 
 **Checklist**
-- [ ] 2 API portal, khách không có hợp đồng thì báo lỗi rõ ràng
-- [ ] Trang Báo sự cố dùng tốt trên khổ điện thoại
-- [ ] `getActiveContractOfUser` để dùng chung
-- [ ] PR đã merge
+- [x] 2 API portal, khách không có hợp đồng thì báo lỗi rõ ràng
+- [x] Trang Báo sự cố dùng tốt trên khổ điện thoại
+- [x] `getActiveContractOfUser` để dùng chung
+- [ ] PR đã merge (sẵn sàng tạo PR)
 
 ---
 

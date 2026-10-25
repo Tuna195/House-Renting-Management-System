@@ -44,6 +44,7 @@ Content-Type: application/json
 
 { "name": "", "electricityPrice": -1 }
 
+<<<<<<< HEAD
 # ============================================================================ PHÒNG (TV1)
 
 ### Danh sách phòng (tất cả tòa nhà của mình)
@@ -137,3 +138,33 @@ Content-Type: application/json
 ### Danh sách phòng của B → mảng rỗng
 GET {{baseUrl}}/rooms
 Authorization: Bearer {{tokenB}}
+=======
+### =============================================================================
+### TV4 — CỔNG KHÁCH THUÊ (PORTAL) & BÁO SỰ CỐ
+### =============================================================================
+
+### Đăng nhập tài khoản khách thuê demo
+# @name tenantLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "khach@demo.vn", "password": "123456" }
+
+### Lấy token của khách thuê
+@tenantToken = {{tenantLogin.response.body.token}}
+
+### Khách xem danh sách các sự cố của mình
+GET {{baseUrl}}/portal/maintenance
+Authorization: Bearer {{tenantToken}}
+
+### Khách gửi yêu cầu báo sự cố mới (Phòng tự động lấy theo hợp đồng ACTIVE)
+POST {{baseUrl}}/portal/maintenance
+Authorization: Bearer {{tenantToken}}
+Content-Type: application/json
+
+{
+  "title": "Hỏng vòi nước bồn rửa bát",
+  "description": "Vòi bị rỉ nước liên tục từ tối qua, vặn chặt van vẫn nhỏ giọt. Nhờ chủ nhà gọi thợ qua sớm giúp mình."
+}
+
+>>>>>>> feature/portal-maintenance

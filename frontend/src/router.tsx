@@ -12,6 +12,8 @@ import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 import TenantHomePage from './pages/TenantHomePage';
 
+import MaintenancePage from './features/portal/MaintenancePage';
+
 // Tự tạo route "Đang phát triển" cho các mục menu chưa làm (có owner trong navigation.tsx)
 const comingSoonRoutes = (nav: NavItem[]): RouteObject[] =>
   nav.filter((item) => item.owner).map((item) => ({ path: item.path, element: <ComingSoonPage item={item} /> }));
@@ -47,8 +49,13 @@ export const router = createBrowserRouter([
         <AppLayout nav={tenantNav} title="Cổng khách thuê" />
       </RequireAuth>
     ),
-    children: [{ index: true, element: <TenantHomePage /> }, ...comingSoonRoutes(tenantNav)],
+    children: [
+      { index: true, element: <TenantHomePage /> },
+      { path: 'maintenance', element: <MaintenancePage /> },
+      ...comingSoonRoutes(tenantNav),
+    ],
   },
 
   { path: '*', element: <NotFoundPage /> },
 ]);
+

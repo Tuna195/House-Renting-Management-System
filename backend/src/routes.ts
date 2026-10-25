@@ -4,6 +4,8 @@ import buildingRoutes from './modules/buildings/buildings.routes';
 import tenantRoutes from './modules/tenants/tenants.routes';
 import roomRoutes from './modules/rooms/rooms.routes';
 
+import portalRoutes from './modules/portal/portal.routes';
+
 // Nơi gắn tất cả các module vào /api. Thêm module mới thì thêm 1 dòng ở đây.
 const api = Router();
 
@@ -13,16 +15,21 @@ api.get('/health', (_req, res) => {
 
 api.use('/auth', authRoutes);
 api.use('/buildings', buildingRoutes);
+<<<<<<< HEAD
 api.use('/tenants', tenantRoutes);
 api.use('/rooms', roomRoutes);
+=======
+api.use('/portal', portalRoutes); // TV4 — Tuần 3 (Cổng khách thuê: Báo sự cố, Tuần 5 thêm HĐ, hóa đơn)
+>>>>>>> feature/portal-maintenance
 
 // TODO — các module sẽ thêm (xem docs/05-api.md để biết ai phụ trách):
 // api.use('/services', serviceRoutes);            // TV1 — Tuần 4
 // api.use('/contracts', contractRoutes);          // TV2 — Tuần 4
 // api.use('/meter-readings', meterReadingRoutes); // TV3 — Tuần 4
 // api.use('/invoices', invoiceRoutes);            // TV3 — Tuần 5
-// api.use('/maintenance', maintenanceRoutes);     // TV4 — Tuần 3
-// api.use('/portal', portalRoutes);               // TV4 — Tuần 5 (API cho khách thuê)
+// api.use('/maintenance', maintenanceRoutes);     // TV4 — Tuần 4 (Quản lý sự cố phía chủ nhà)
+// api.use('/payments', paymentRoutes);            // TV2 — Tuần 8 (VietQR + webhook)
+// api.use('/push', pushRoutes);                   // TV4 — Tuần 9
 // api.use('/payments', paymentRoutes);            // TV2 — Tuần 8 (VietQR + webhook)
 // api.use('/push', pushRoutes);                   // TV4 — Tuần 9
 

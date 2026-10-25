@@ -52,8 +52,8 @@ Trạng thái: ✅ xong · 🚧 đang làm · ⬜ chưa làm. Request mẫu đ�
 ## Sự cố, Thông báo, Cổng khách thuê, Push (TV4)
 | Method | Đường dẫn | Vai trò | Mô tả | TT |
 |---|---|---|---|---|
-| POST | `/portal/maintenance` | 🔒 T | Khách gửi yêu cầu (phòng lấy từ hợp đồng hiệu lực) | ⬜ T3 |
-| GET | `/portal/maintenance` | 🔒 T | Yêu cầu của tôi | ⬜ T3 |
+| POST | `/portal/maintenance` | 🔒 T | Khách gửi yêu cầu (phòng lấy từ hợp đồng hiệu lực) | ✅ |
+| GET | `/portal/maintenance` | 🔒 T | Yêu cầu của tôi | ✅ |
 | GET | `/maintenance?status=` | 🔒 L | Mọi yêu cầu ở các tòa nhà của tôi | ⬜ T4 |
 | PATCH | `/maintenance/:id` | 🔒 L | Đổi trạng thái | ⬜ T4 |
 | GET | `/notifications` | 🔒 L,T | Thông báo của tôi | ⬜ T4 |

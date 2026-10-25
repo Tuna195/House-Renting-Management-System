@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap');
+      text { font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      .code { font-family: 'JetBrains Mono', monospace; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a" />
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626" />
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="650" fill="#f8fafc" rx="16" />
+
+  <!-- Title & Subtitle -->
+  <g transform="translate(50, 40)">
+    <rect width="150" height="26" rx="13" fill="#eff6ff" />
+    <text x="75" y="17" fill="#2563eb" font-size="12" font-weight="700" text-anchor="middle">UML STATE DIAGRAM</text>
+    <text x="0" y="55" fill="#0f172a" font-size="22" font-weight="700">Sơ Đồ Trạng Thái Yêu Cầu Sửa Chữa (Maintenance Request)</text>
+    <text x="0" y="78" fill="#64748b" font-size="13">Phân hệ: Cổng Khách Thuê &amp; Quản Lý Sự Cố (TV4) • Hệ Thống Quản Lý Nhà Trọ</text>
+  </g>
+
+  <!-- START NODE -->
+  <g transform="translate(80, 240)">
+    <circle cx="20" cy="20" r="14" fill="#0f172a" />
+    <circle cx="20" cy="20" r="18" fill="none" stroke="#0f172a" stroke-width="2" opacity="0.3" />
+    <text x="20" y="52" fill="#475569" font-size="12" font-weight="600" text-anchor="middle">Bắt đầu</text>
+  </g>
+
+  <!-- Arrow Start -> OPEN -->
+  <path d="M 120 260 L 180 260" stroke="#2563eb" stroke-width="2.5" fill="none" marker-end="url(#arrow)" />
+  <text x="150" y="248" fill="#2563eb" font-size="11" font-weight="600" text-anchor="middle">Khách gửi form</text>
+
+  <!-- STATE: OPEN -->
+  <g transform="translate(190, 200)" filter="url(#shadow)">
+    <rect width="200" height="120" rx="12" fill="#ffffff" stroke="#eab308" stroke-width="2.5" />
+    <rect width="200" height="36" rx="12" fill="#fefce8" />
+    <rect y="24" width="200" height="12" fill="#fefce8" />
+    <line x1="0" y1="36" x2="200" y2="36" stroke="#fef08a" stroke-width="1.5" />
+    
+    <text x="20" y="24" fill="#854d0e" font-size="14" font-weight="700" class="code">🟡 OPEN</text>
+    <text x="180" y="23" fill="#a16207" font-size="10" font-weight="600" text-anchor="end">Chờ tiếp nhận</text>
+
+    <!-- Body -->
+    <text x="16" y="58" fill="#334155" font-size="11">• Khởi tạo bởi: <tspan font-weight="700">Khách thuê</tspan></text>
+    <text x="16" y="78" fill="#334155" font-size="11">• Entry: <tspan fill="#2563eb" font-weight="600">Bắn chuông cho Chủ</tspan></text>
+    <text x="16" y="98" fill="#64748b" font-size="10.5">Khách có thể sửa / hủy</text>
+  </g>
+
+  <!-- TRANSITION: OPEN -> IN_PROGRESS -->
+  <path d="M 390 240 L 480 240" stroke="#2563eb" stroke-width="2.5" fill="none" marker-end="url(#arrow)" />
+  <g transform="translate(435, 200)">
+    <rect x="-85" y="-12" width="170" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" />
+    <text x="0" y="4" fill="#0f172a" font-size="11" font-weight="700" text-anchor="middle">Chủ nhà tiếp nhận</text>
+    <text x="0" y="20" fill="#2563eb" font-size="9.5" text-anchor="middle">action: Gửi Push cho Khách</text>
+  </g>
+
+  <!-- STATE: IN_PROGRESS -->
+  <g transform="translate(490, 200)" filter="url(#shadow)">
+    <rect width="210" height="120" rx="12" fill="#ffffff" stroke="#3b82f6" stroke-width="2.5" />
+    <rect width="210" height="36" rx="12" fill="#eff6ff" />
+    <rect y="24" width="210" height="12" fill="#eff6ff" />
+    <line x1="0" y1="36" x2="210" y2="36" stroke="#bfdbfe" stroke-width="1.5" />
+    
+    <text x="20" y="24" fill="#1e40af" font-size="14" font-weight="700" class="code">🔵 IN_PROGRESS</text>
+    <text x="190" y="23" fill="#2563eb" font-size="10" font-weight="600" text-anchor="end">Đang xử lý</text>
+
+    <!-- Body -->
+    <text x="16" y="58" fill="#334155" font-size="11">• Duyệt bởi: <tspan font-weight="700">Chủ nhà</tspan></text>
+    <text x="16" y="78" fill="#334155" font-size="11">• Trạng thái: <tspan fill="#1e40af" font-weight="600">Đã gọi thợ / hẹn giờ</tspan></text>
+    <text x="16" y="98" fill="#64748b" font-size="10.5">Khách theo dõi tiến độ</text>
+  </g>
+
+  <!-- TRANSITION: IN_PROGRESS -> DONE -->
+  <path d="M 700 260 L 780 260" stroke="#16a34a" stroke-width="2.5" fill="none" marker-end="url(#arrow-green)" />
+  <g transform="translate(740, 220)">
+    <rect x="-65" y="-10" width="130" height="40" rx="6" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" />
+    <text x="0" y="5" fill="#166534" font-size="11" font-weight="700" text-anchor="middle">Sửa chữa xong</text>
+    <text x="0" y="20" fill="#15803d" font-size="9.5" text-anchor="middle">action: Nghiệm thu</text>
+  </g>
+
+  <!-- STATE: DONE -->
+  <g transform="translate(790, 200)" filter="url(#shadow)">
+    <rect width="170" height="120" rx="12" fill="#ffffff" stroke="#22c55e" stroke-width="2.5" />
+    <rect width="170" height="36" rx="12" fill="#f0fdf4" />
+    <rect y="24" width="170" height="12" fill="#f0fdf4" />
+    <line x1="0" y1="36" x2="170" y2="36" stroke="#bbf7d0" stroke-width="1.5" />
+    
+    <text x="16" y="24" fill="#166534" font-size="14" font-weight="700" class="code">🟢 DONE</text>
+    <text x="155" y="23" fill="#15803d" font-size="10" font-weight="600" text-anchor="end">Hoàn tất</text>
+
+    <!-- Body -->
+    <text x="14" y="58" fill="#334155" font-size="11">• Lưu: <tspan font-weight="700">resolvedAt</tspan></text>
+    <text x="14" y="78" fill="#334155" font-size="11">• Gửi push thông báo</text>
+    <text x="14" y="98" fill="#166534" font-size="10.5">Khách đánh giá hài lòng</text>
+  </g>
+
+  <!-- TRANSITION: OPEN -> REJECTED -->
+  <path d="M 290 320 L 290 420 Q 290 450 320 450 L 480 450" stroke="#dc2626" stroke-width="2.5" fill="none" marker-end="url(#arrow-red)" />
+  <g transform="translate(350, 420)">
+    <rect x="-70" y="-12" width="140" height="38" rx="6" fill="#fef2f2" stroke="#fecaca" stroke-width="1" />
+    <text x="0" y="3" fill="#991b1b" font-size="10.5" font-weight="700" text-anchor="middle">Chủ nhà từ chối</text>
+    <text x="0" y="18" fill="#dc2626" font-size="9" text-anchor="middle">kèm lý do (sai phòng...)</text>
+  </g>
+
+  <!-- TRANSITION: IN_PROGRESS -> REJECTED -->
+  <path d="M 595 320 L 595 390" stroke="#dc2626" stroke-width="2" stroke-dasharray="4" fill="none" marker-end="url(#arrow-red)" />
+  <text x="605" y="360" fill="#dc2626" font-size="9.5">Hủy giữa chừng</text>
+
+  <!-- STATE: REJECTED -->
+  <g transform="translate(490, 400)" filter="url(#shadow)">
+    <rect width="210" height="110" rx="12" fill="#ffffff" stroke="#ef4444" stroke-width="2.5" />
+    <rect width="210" height="34" rx="12" fill="#fef2f2" />
+    <rect y="22" width="210" height="12" fill="#fef2f2" />
+    <line x1="0" y1="34" x2="210" y2="34" stroke="#fecaca" stroke-width="1.5" />
+    
+    <text x="18" y="23" fill="#991b1b" font-size="14" font-weight="700" class="code">🔴 REJECTED</text>
+    <text x="195" y="22" fill="#dc2626" font-size="10" font-weight="600" text-anchor="end">Từ chối</text>
+
+    <!-- Body -->
+    <text x="16" y="54" fill="#334155" font-size="11">• Lý do: <tspan font-weight="600">Khách tự làm hỏng /</tspan></text>
+    <text x="16" y="72" fill="#334155" font-size="11">  không thuộc trách nhiệm</text>
+    <text x="16" y="92" fill="#dc2626" font-size="10.5">• Bắn thông báo giải thích</text>
+  </g>
+
+  <!-- END NODE FROM DONE -->
+  <g transform="translate(860, 370)">
+    <path d="M 875 320 L 875 365" stroke="#16a34a" stroke-width="2" fill="none" marker-end="url(#arrow-green)" />
+    <circle cx="875" cy="385" r="14" fill="#ffffff" stroke="#0f172a" stroke-width="2" />
+    <circle cx="875" cy="385" r="8" fill="#0f172a" />
+    <text x="875" y="415" fill="#475569" font-size="11" font-weight="600" text-anchor="middle">Kết thúc</text>
+  </g>
+
+  <!-- END NODE FROM REJECTED -->
+  <path d="M 700 455 L 855 455 Q 875 455 875 410" stroke="#dc2626" stroke-width="2" fill="none" marker-end="url(#arrow-red)" />
+
+  <!-- FOOTER RULES BOX -->
+  <g transform="translate(50, 545)">
+    <rect width="900" height="75" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <text x="20" y="25" fill="#0f172a" font-size="12" font-weight="700">🔒 BẢNG QUY TẮC PHÂN QUYỀN CHUYỂN TRẠNG THÁI (AUTHORIZATION MATRIX):</text>
+    <text x="20" y="48" fill="#334155" font-size="11.5">• <tspan font-weight="700" fill="#2563eb">Khách thuê (TENANT):</tspan> Chỉ được tạo yêu cầu mới (vào trạng thái OPEN) và xem yêu cầu của chính phòng mình đang ở.</text>
+    <text x="20" y="66" fill="#334155" font-size="11.5">• <tspan font-weight="700" fill="#16a34a">Chủ nhà (LANDLORD):</tspan> Toàn quyền chuyển đổi: OPEN ➔ IN_PROGRESS / REJECTED; IN_PROGRESS ➔ DONE / REJECTED.</text>
+  </g>
+</svg>
