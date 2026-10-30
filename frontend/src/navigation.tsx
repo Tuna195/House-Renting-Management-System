@@ -29,7 +29,7 @@ export const landlordNav: NavItem[] = [
   { path: '/rooms', label: 'Phòng', icon: <HomeOutlined /> },
   { path: '/services', label: 'Dịch vụ', icon: <AppstoreOutlined />, owner: 'TV1', week: 4 },
   { path: '/tenants', label: 'Khách thuê', icon: <TeamOutlined /> },
-  { path: '/contracts', label: 'Hợp đồng', icon: <FileDoneOutlined />, owner: 'TV2', week: 4 },
+  { path: '/contracts', label: 'Hợp đồng', icon: <FileDoneOutlined /> },
   { path: '/meter-readings', label: 'Chỉ số điện nước', icon: <ThunderboltOutlined />, owner: 'TV3', week: 4 },
   { path: '/invoices', label: 'Hóa đơn', icon: <FileTextOutlined />, owner: 'TV3', week: 5 },
   { path: '/maintenance', label: 'Sự cố', icon: <ToolOutlined />, owner: 'TV4', week: 4 },

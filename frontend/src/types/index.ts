@@ -86,7 +86,56 @@ export type RoomInput = Pick<Room, 'buildingId' | 'name' | 'baseRent' | 'maxOccu
 // Khi sửa: không đổi được tòa nhà; trạng thái chỉ đổi tay giữa Trống ↔ Sửa chữa
 export type RoomUpdateInput = Partial<Omit<RoomInput, 'buildingId'>> & { status?: Exclude<RoomStatus, 'OCCUPIED'> };
 
-// TODO: thêm Tenant, Contract, MeterReading, Invoice... khi làm các module tương ứng
+export type ServiceUnit = 'PER_ROOM' | 'PER_PERSON' | 'PER_QUANTITY';
+
+export interface Service {
+  id: number;
+  buildingId: number;
+  name: string;
+  price: number;
+  unit: ServiceUnit;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export type ContractStatus = 'ACTIVE' | 'ENDED' | 'CANCELLED';
+
+export interface ContractTenant {
+  tenantId: number;
+  isPrimary: boolean;
+  tenant?: Pick<Tenant, 'id' | 'fullName' | 'phone'>;
+}
+
+export interface ContractService {
+  serviceId: number;
+  quantity: number;
+  service?: Service;
+}
+
+export interface Contract {
+  id: number;
+  roomId: number;
+  startDate: string;
+  endDate: string | null;
+  rentPrice: number;
+  deposit: number;
+  status: ContractStatus;
+  room?: Pick<Room, 'id' | 'name'> & { building?: Pick<Building, 'id' | 'name'> };
+  tenants?: ContractTenant[];
+  services?: ContractService[];
+}
+
+export interface ContractInput {
+  roomId: number;
+  startDate: string;
+  endDate?: string;
+  rentPrice: number;
+  deposit: number;
+  tenantIds: number[];
+  primaryTenantId: number;
+  services: { serviceId: number; quantity: number }[];
+}
+
 // -----------------------------------------------------------------------------
 // TV4 — SỰ CỐ & CỔNG KHÁCH THUÊ
 // -----------------------------------------------------------------------------
