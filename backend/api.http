@@ -165,3 +165,46 @@ Content-Type: application/json
   "description": "Vòi bị rỉ nước liên tục từ tối qua, vặn chặt van vẫn nhỏ giọt. Nhờ chủ nhà gọi thợ qua sớm giúp mình."
 }
 
+### =============================================================================
+### TV4 (TUẦN 4) — QUẢN LÝ SỰ CỐ PHÍA CHỦ NHÀ & THÔNG BÁO
+### =============================================================================
+
+### Chủ nhà xem danh sách sự cố thuộc các tòa nhà của mình
+GET {{baseUrl}}/maintenance
+Authorization: Bearer {{token}}
+
+### Chủ nhà lọc sự cố theo trạng thái OPEN (Chờ duyệt)
+GET {{baseUrl}}/maintenance?status=OPEN
+Authorization: Bearer {{token}}
+
+### Chủ nhà tiếp nhận xử lý sự cố (Chuyển sang IN_PROGRESS)
+PATCH {{baseUrl}}/maintenance/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "IN_PROGRESS"
+}
+
+### Chủ nhà xác nhận sửa xong hoàn tất (Chuyển sang DONE)
+PATCH {{baseUrl}}/maintenance/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "DONE"
+}
+
+### Xem danh sách thông báo của người dùng (20 cái mới nhất + số chưa đọc)
+GET {{baseUrl}}/notifications
+Authorization: Bearer {{token}}
+
+### Đánh dấu 1 thông báo là đã đọc
+POST {{baseUrl}}/notifications/1/read
+Authorization: Bearer {{token}}
+
+### Đánh dấu tất cả thông báo là đã đọc
+POST {{baseUrl}}/notifications/read-all
+Authorization: Bearer {{token}}
+
+

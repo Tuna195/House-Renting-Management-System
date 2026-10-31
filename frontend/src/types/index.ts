@@ -157,12 +157,33 @@ export interface MaintenanceRequest {
     name: string;
     building?: { id: number; name: string; address?: string };
   };
+  createdBy?: {
+    id: number;
+    fullName: string;
+    phone?: string;
+    email?: string;
+  };
 }
 
 export interface CreateMaintenanceInput {
   title: string;
   description?: string;
   imageUrl?: string;
+}
+
+export interface NotificationItem {
+  id: number;
+  userId: number;
+  title: string;
+  body: string;
+  link: string | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface NotificationListResponse {
+  items: NotificationItem[];
+  unreadCount: number;
 }
 
 export interface ActiveContract {
