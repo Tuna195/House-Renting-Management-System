@@ -3,7 +3,7 @@
 import type { PropsWithChildren } from 'react';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AxiosHeaders, type AxiosResponse } from 'axios';
+import { AxiosError, AxiosHeaders, type AxiosResponse } from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { meterApi, type Reading } from '../../api/meter-readings';
 import { useScopedMeterReadings } from './useScopedMeterReadings';
@@ -214,4 +214,51 @@ describe('Bản nháp theo scope và version', () => {
     expect(result.current.drafts).toEqual({});
     expect(mockSave).not.toHaveBeenCalled();
   });
+});
+
+
+function apiFailure(code = 'VALIDATION_ERROR', status = 400) {
+  return new AxiosError('Request failed', undefined, undefined, undefined, {
+    ...response, status, data: { code, message: 'Không thể lưu chỉ số', details: [
+      { path: ['readings', 0, 'electricEnd'], code: 'custom', message: 'Kiểm tra điện mới' },
+    ] },
+  });
+}
+
+it('lỗi server của A gắn đúng roomId trong snapshot, không xuất hiện ở B', async () => {
+  const request = queueRequest();
+  const { result, rerender, feedback } = setup();
+  act(() => result.current.updateReading(1, 'electricEnd', 20));
+  act(() => result.current.saveReadings([reading]));
+  rerender({ buildingId: 2, period: '2026-10' });
+  act(() => result.current.updateReading(2, 'electricEnd', 50));
+  await act(async () => request.reject(apiFailure()));
+  await waitFor(() => expect(feedback.onError).toHaveBeenCalledTimes(1));
+  expect(result.current.fieldErrors).toEqual({});
+  expect(result.current.error).toBeUndefined();
+  rerender({ buildingId: 1, period: '2026-10' });
+  expect(result.current.fieldErrors[1].electricEnd).toBe('Kiểm tra điện mới');
+  expect(result.current.drafts[1].electricEnd).toBe(20);
+  act(() => result.current.updateReading(1, 'electricEnd', 25));
+  expect(result.current.fieldErrors).toEqual({});
+});
+it('không gắn lỗi phản hồi cũ lên bản nháp đã tăng version', async () => {
+  const request = queueRequest(); const { result } = setup();
+  act(() => result.current.saveReadings([reading]));
+  act(() => result.current.updateReading(1, 'electricEnd', 25));
+  await act(async () => request.reject(apiFailure()));
+  await waitFor(() => expect(result.current.isSaving).toBe(false));
+  expect(result.current.fieldErrors).toEqual({});
+  expect(result.current.error).toBeUndefined();
+  expect(result.current.drafts[1].electricEnd).toBe(25);
+});
+it('409 PERIOD_LOCKED làm mới đúng scope và giữ bản nháp để đối chiếu', async () => {
+  const request = queueRequest(); const { result, invalidate } = setup();
+  act(() => result.current.updateReading(1, 'electricEnd', 20));
+  act(() => result.current.saveReadings([reading]));
+  await act(async () => request.reject(apiFailure('PERIOD_LOCKED', 409)));
+  await waitFor(() => expect(result.current.isSaving).toBe(false));
+  expect(invalidate).toHaveBeenCalledWith({ queryKey: ['meter-readings', 1, '2026-10'], exact: true });
+  expect(result.current.drafts[1].electricEnd).toBe(20);
+  expect(result.current.error).toBe('Không thể lưu chỉ số');
 });

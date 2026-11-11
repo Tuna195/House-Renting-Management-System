@@ -4,7 +4,9 @@ import { databaseIdSchema, httpIdSchema } from '../../validation/id.schema';
 import { calculateUsage } from '../billing/billing';
 
 // Giới hạn ID và chỉ số trong phạm vi Int của database; kỳ dùng định dạng YYYY-MM.
-const index = z.number().int().min(0).max(2147483647);
+const index = z.number({ invalid_type_error: 'Chỉ số phải là số nguyên', required_error: 'Bắt buộc nhập chỉ số' })
+  .int('Chỉ số phải là số nguyên').min(0, 'Chỉ số không được âm')
+  .max(2147483647, 'Chỉ số không được vượt quá 2147483647');
 const period = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).refine((s) => !s.startsWith('0000'));
 export const meterReadingsQuerySchema = z.object({ buildingId: httpIdSchema, period });
 const reading = z.object({ roomId: databaseIdSchema, electricStart: index, electricEnd: index, waterStart: index, waterEnd: index });

@@ -22,7 +22,7 @@ export default function MeterReadingsPage() {
   const { message } = App.useApp();
   const [buildingId, setBuildingId] = useState<number>();
   const [period, setPeriod] = useState(dayjs().format('YYYY-MM'));
-  const { drafts, isSaving, updateReading, saveReadings } = useScopedMeterReadings(buildingId, period, {
+  const { drafts, fieldErrors, error: saveError, isSaving, updateReading, saveReadings } = useScopedMeterReadings(buildingId, period, {
     onSaved: (saved) => message.success(`Đã lưu chỉ số tòa nhà #${saved.buildingId}, tháng ${saved.period}`),
     onError: (error) => message.error(getErrorMessage(error)),
   });
@@ -58,14 +58,13 @@ export default function MeterReadingsPage() {
   // Dùng chung cấu hình trường cho bốn cột nhập; hai cột tiêu thụ chỉ hiển thị kết quả.
   const columns: TableColumnsType<EditableMeterRow> = [
     { title: 'Phòng', render: (_, row) => `${row.room.name}${row.locked ? ' — Đã khóa' : ''}` },
-    ...READING_FIELDS.map(({ field, label }, columnIndex) => ({
+    ...READING_FIELDS.map(({ field, label }) => ({
       title: label,
-      render: (_: unknown, row: EditableMeterRow, rowIndex: number) => (
+      render: (_: unknown, row: EditableMeterRow) => (
         <ReadingInputCell
           row={row}
-          rowIndex={rowIndex}
-          columnIndex={columnIndex}
           field={field}
+          serverError={fieldErrors[row.room.id]?.[field]}
           onChange={updateReading}
         />
       ),
@@ -108,6 +107,7 @@ export default function MeterReadingsPage() {
         />
       )}
       <Alert type="info" title="Bản nháp được giữ riêng theo tòa nhà và tháng khi đổi bộ lọc trong trang này." />
+      {saveError && <Alert type="error" title={saveError} />}
       <Table
         rowKey={(row) => row.room.id}
         dataSource={rows}

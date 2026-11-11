@@ -2,12 +2,15 @@
 import { useReducer, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { meterApi, type Reading } from '../../api/meter-readings';
-import type { ReadingDrafts, ReadingField } from './meterReadings.utils';
+import { readMeterError, type MeterFieldErrors } from './meterReadingErrors';
+import type { ReadingDrafts, ReadingField, ReadingValue } from './meterReadings.utils';
 
 interface DraftScope {
   version: number;
   drafts: ReadingDrafts;
   saving: boolean;
+  fieldErrors: MeterFieldErrors;
+  error?: string;
 }
 
 export interface SaveVariables {
@@ -20,11 +23,12 @@ export interface SaveVariables {
 
 type ScopeState = Record<string, DraftScope>;
 type ScopeAction =
-  | { type: 'edit'; scopeKey: string; roomId: number; field: ReadingField; value: number | null }
+  | { type: 'edit'; scopeKey: string; roomId: number; field: ReadingField; value: ReadingValue | null }
   | { type: 'start' | 'finish'; scopeKey: string }
-  | { type: 'saved'; scopeKey: string; version: number };
+  | { type: 'saved'; scopeKey: string; version: number }
+  | { type: 'failed'; scopeKey: string; version: number; fieldErrors: MeterFieldErrors; error: string };
 
-const EMPTY_SCOPE: DraftScope = { version: 0, drafts: {}, saving: false };
+const EMPTY_SCOPE: DraftScope = { version: 0, drafts: {}, saving: false, fieldErrors: {} };
 
 /** Giữ version tăng theo mỗi chỉnh sửa; không tái sử dụng version sau khi dọn bản nháp. */
 function scopeReducer(state: ScopeState, action: ScopeAction): ScopeState {
@@ -35,6 +39,8 @@ function scopeReducer(state: ScopeState, action: ScopeAction): ScopeState {
       next = {
         ...scope,
         version: scope.version + 1,
+        fieldErrors: {},
+        error: undefined,
         drafts: {
           ...scope.drafts,
           [action.roomId]: { ...scope.drafts[action.roomId], [action.field]: action.value ?? undefined },
@@ -42,7 +48,7 @@ function scopeReducer(state: ScopeState, action: ScopeAction): ScopeState {
       };
       break;
     case 'start':
-      next = { ...scope, saving: true };
+      next = { ...scope, saving: true, fieldErrors: {}, error: undefined };
       break;
     case 'finish':
       next = { ...scope, saving: false };
@@ -50,7 +56,11 @@ function scopeReducer(state: ScopeState, action: ScopeAction): ScopeState {
     case 'saved':
       // Phản hồi cũ chỉ được dọn đúng bản nháp đã gửi, không chạm chỉnh sửa mới hơn.
       if (scope.version !== action.version) return state;
-      next = { ...scope, drafts: {} };
+      next = { ...scope, drafts: {}, fieldErrors: {}, error: undefined };
+      break;
+    case 'failed':
+      if (scope.version !== action.version) return state;
+      next = { ...scope, fieldErrors: action.fieldErrors, error: action.error };
       break;
   }
   return { ...state, [action.scopeKey]: next };
@@ -82,7 +92,17 @@ export function useScopedMeterReadings(buildingId: number | undefined, period: s
       dispatch({ type: 'saved', scopeKey: variables.scopeKey, version: variables.version });
       feedback.onSaved(variables);
     },
-    onError: (error) => feedback.onError(error),
+    onError: async (error, variables) => {
+      const failure = readMeterError(error, variables.readings);
+      dispatch({ type: 'failed', scopeKey: variables.scopeKey, version: variables.version,
+        fieldErrors: failure.fields, error: failure.message });
+      if (failure.code === 'PERIOD_LOCKED') {
+        await queryClient.invalidateQueries({
+          queryKey: ['meter-readings', variables.buildingId, variables.period], exact: true,
+        });
+      }
+      feedback.onError(error);
+    },
     onSettled: (_response, _error, variables) => {
       pendingScopes.current.delete(variables.scopeKey);
       dispatch({ type: 'finish', scopeKey: variables.scopeKey });
@@ -90,7 +110,7 @@ export function useScopedMeterReadings(buildingId: number | undefined, period: s
   });
 
   /** Sửa đúng phòng trong scope đang hiển thị; dữ liệu ở các scope khác được giữ nguyên. */
-  function updateReading(roomId: number, field: ReadingField, value: number | null) {
+  function updateReading(roomId: number, field: ReadingField, value: ReadingValue | null) {
     if (scopeKey === undefined) return;
     dispatch({ type: 'edit', scopeKey, roomId, field, value });
   }
@@ -109,5 +129,5 @@ export function useScopedMeterReadings(buildingId: number | undefined, period: s
     });
   }
 
-  return { drafts: activeScope.drafts, isSaving: activeScope.saving, updateReading, saveReadings };
+  return { fieldErrors: activeScope.fieldErrors, error: activeScope.error, drafts: activeScope.drafts, isSaving: activeScope.saving, updateReading, saveReadings };
 }

@@ -48,7 +48,7 @@ it('giữ bản nháp ở B và chỉnh sửa mới ở A khi request lưu A ho�
   render(<QueryClientProvider client={client}><App><MeterReadingsPage /></App></QueryClientProvider>);
 
   await selectBuilding('Tòa A');
-  const inputA = await screen.findByRole('spinbutton', { name: 'P1 electricEnd' });
+  const inputA = await screen.findByRole<HTMLInputElement>('textbox', { name: 'P1 Điện mới' });
   fireEvent.change(inputA, { target: { value: '21' } });
   const saveButton = screen.getByRole('button', { name: 'Lưu tất cả' });
   await waitFor(() => expect(saveButton.hasAttribute('disabled')).toBe(false));
@@ -59,17 +59,17 @@ it('giữ bản nháp ở B và chỉnh sửa mới ở A khi request lưu A ho�
   fireEvent.change(inputA, { target: { value: '22' } });
 
   await selectBuilding('Tòa B');
-  const inputB = await screen.findByRole('spinbutton', { name: 'P2 electricEnd' });
+  const inputB = await screen.findByRole<HTMLInputElement>('textbox', { name: 'P2 Điện mới' });
   fireEvent.change(inputB, { target: { value: '99' } });
   await waitFor(() => expect(saveButton.hasAttribute('disabled')).toBe(false));
   await act(async () => resolveSave({
     data: { saved: 1 }, status: 200, statusText: 'OK', headers: {}, config: { headers: new AxiosHeaders() },
   }));
   await screen.findByText(/Đã lưu chỉ số tòa nhà #1/);
-  expect(inputB.getAttribute('value')).toBe('99');
+  expect(inputB.value).toBe('99');
 
   await selectBuilding('Tòa A');
-  await waitFor(() => expect(screen.getByRole('spinbutton', { name: 'P1 electricEnd' }).getAttribute('value')).toBe('22'));
+  await waitFor(() => expect(screen.getByRole<HTMLInputElement>('textbox', { name: 'P1 Điện mới' }).value).toBe('22'));
   expect(meterApi.save).toHaveBeenCalledTimes(1);
   client.clear();
 });

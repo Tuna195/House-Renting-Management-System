@@ -14,7 +14,8 @@ export const READING_FIELDS = [
 export type ReadingField = (typeof READING_FIELDS)[number]['field'];
 export type MeterKind = 'electric' | 'water';
 // Bản nháp có thể thiếu chỉ số; các bản nháp được lưu theo roomId.
-export type ReadingDraft = Partial<Reading>;
+export type ReadingValue = number | string;
+export type ReadingDraft = Partial<Record<ReadingField, ReadingValue>>;
 export type ReadingDrafts = Record<number, ReadingDraft>;
 export interface EditableMeterRow extends MeterRow {
   values: ReadingDraft;
@@ -34,23 +35,32 @@ export function prepareRows(rows: MeterRow[], drafts: ReadingDrafts): EditableMe
   }));
 }
 
-/** Kiểm tra đủ bốn chỉ số nguyên trong giới hạn và không có chỉ số cuối nhỏ hơn đầu. */
-export function isReadingValid({ values }: EditableMeterRow): boolean {
-  return (
-    READING_FIELDS.every(({ field }) => {
-      const value = values[field];
-      return Number.isInteger(value) && Number(value) >= 0 && Number(value) <= MAX_METER_INDEX;
-    }) &&
-    Number(values.electricEnd) >= Number(values.electricStart) &&
-    Number(values.waterEnd) >= Number(values.waterStart)
-  );
+/** Parse chỉ số giao diện, giữ nguyên chuỗi sai để hiển thị lỗi thay vì tự sửa giá trị. */
+export function parseMeterIndex(value: unknown): number | undefined {
+  if (typeof value !== 'number' && (typeof value !== 'string' || !/^[0-9]+$/.test(value))) return undefined;
+  const number = Number(value);
+  return Number.isInteger(number) && number >= 0 && number <= MAX_METER_INDEX ? number : undefined;
 }
 
-/** Xác định ô thiếu dữ liệu hoặc chỉ số cuối nhỏ hơn đầu để hiển thị lỗi tại ô. */
-export function isFieldInvalid(values: ReadingDraft, field: ReadingField): boolean {
-  const isEnd = field.endsWith('End');
-  const start = field === 'electricEnd' ? values.electricStart : values.waterStart;
-  return values[field] == null || (isEnd && Number(values[field]) < Number(start));
+/** Một nguồn kiểm tra dùng cho lỗi tại ô, nút lưu và tính tiêu thụ. */
+export function getFieldError(values: ReadingDraft, field: ReadingField): string | undefined {
+  const value = values[field];
+  if (value === undefined || value === '') return 'Bắt buộc nhập chỉ số';
+  if (typeof value === 'string' && !/^[0-9]+$/.test(value)) return 'Chỉ nhập chữ số từ 0 đến 9';
+  const number = Number(value);
+  if (!Number.isInteger(number)) return 'Chỉ số phải là số nguyên';
+  if (number < 0) return 'Chỉ số không được âm';
+  if (number > MAX_METER_INDEX) return `Chỉ số không được vượt quá ${MAX_METER_INDEX}`;
+  if (field.endsWith('End')) {
+    const start = parseMeterIndex(field === 'electricEnd' ? values.electricStart : values.waterStart);
+    if (start !== undefined && number < start) return 'Chỉ số mới không được nhỏ hơn chỉ số cũ';
+  }
+  return undefined;
+}
+
+/** Kiểm tra đủ bốn chỉ số với cùng quy tắc dùng cho thông báo tại ô. */
+export function isReadingValid({ values }: EditableMeterRow): boolean {
+  return READING_FIELDS.every(({ field }) => getFieldError(values, field) === undefined);
 }
 
 /** Chuyển dòng đã qua isReadingValid thành dữ liệu gửi API; hàm này không tự validate. */
@@ -66,9 +76,9 @@ export function toReading({ room, values }: EditableMeterRow): Reading {
 
 /** Tính tiêu thụ và cảnh báo riêng cho điện/nước; trả null khi thiếu số hoặc chỉ số bị giảm. */
 export function getConsumption(row: EditableMeterRow, kind: MeterKind) {
-  const start = row.values[`${kind}Start`];
-  const end = row.values[`${kind}End`];
-  if (start == null || end == null || end < start) return null;
+  const start = parseMeterIndex(row.values[`${kind}Start`]);
+  const end = parseMeterIndex(row.values[`${kind}End`]);
+  if (start === undefined || end === undefined || end < start) return null;
 
   const usage = end - start;
   // Chỉ so sánh gấp đôi nếu kỳ trước có tiêu thụ dương; cảnh báo không ngăn việc lưu.

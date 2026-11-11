@@ -1,56 +1,65 @@
-/** Các ô hiển thị của bảng điện nước: ô nhập chỉ số và ô tiêu thụ kèm cảnh báo. */
-import { Alert, InputNumber } from 'antd';
-import {
-  getConsumption,
-  isFieldInvalid,
-  MAX_METER_INDEX,
-  type EditableMeterRow,
-  type MeterKind,
-  type ReadingField,
-} from './meterReadings.utils';
+/** Ô nhập giữ nguyên dữ liệu sai, liên kết lỗi với input và hỗ trợ điều hướng cùng cột. */
+import { Alert, Input } from 'antd';
+import { getConsumption, getFieldError, READING_FIELDS, type EditableMeterRow, type MeterKind,
+  type ReadingField, type ReadingValue } from './meterReadings.utils';
 
 interface ReadingInputCellProps {
   row: EditableMeterRow;
-  rowIndex: number;
-  columnIndex: number;
   field: ReadingField;
-  onChange: (roomId: number, field: ReadingField, value: number | null) => void;
+  serverError?: string;
+  onChange: (roomId: number, field: ReadingField, value: ReadingValue | null) => void;
 }
 
-/** Hiển thị một chỉ số, chuyển thay đổi lên trang cha và khóa nhập theo trạng thái của dòng. */
-export function ReadingInputCell({ row, rowIndex, columnIndex, field, onChange }: ReadingInputCellProps) {
-  const invalid = isFieldInvalid(row.values, field) && !row.locked;
+/** Tìm dòng khả dụng tiếp theo/trước đó trong chính bảng hiện tại, không vượt sang bảng khác. */
+function focusAdjacentInput(input: HTMLInputElement, field: ReadingField, backwards: boolean) {
+  const table = input.closest('table');
+  if (!table) return;
+  const inputs = Array.from(table.querySelectorAll<HTMLInputElement>(`input[data-meter-field="${field}"]`));
+  const index = inputs.indexOf(input);
+  for (let next = index + (backwards ? -1 : 1); next >= 0 && next < inputs.length; next += backwards ? -1 : 1) {
+    if (!inputs[next].disabled) {
+      inputs[next].focus();
+      return;
+    }
+  }
+}
 
+/** Hiển thị lỗi cụ thể; Tab dùng thứ tự DOM, Enter/Shift+Enter bỏ qua dòng đã khóa. */
+export function ReadingInputCell({ row, field, serverError, onChange }: ReadingInputCellProps) {
+  const error = row.locked ? undefined : (getFieldError(row.values, field) ?? serverError);
+  const inputId = `meter-${row.room.id}-${field}`;
+  const errorId = `${inputId}-error`;
+  const label = READING_FIELDS.find((item) => item.field === field)?.label;
   return (
     <div>
-      <InputNumber
-        aria-label={`${row.room.name} ${field}`}
-        id={`meter-${rowIndex}-${columnIndex}`}
-        min={0}
-        max={MAX_METER_INDEX}
-        precision={0}
+      <Input
+        aria-label={`${row.room.name} ${label}`}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        id={inputId}
+        data-meter-field={field}
+        inputMode="numeric"
+        autoComplete="off"
         disabled={row.locked}
-        value={row.values[field]}
-        status={invalid ? 'error' : undefined}
-        onChange={(value) => onChange(row.room.id, field, value)}
+        value={row.values[field] ?? ''}
+        status={error ? 'error' : undefined}
+        onChange={(event) => onChange(row.room.id, field, event.target.value)}
         onKeyDown={(event) => {
-          if (event.key === 'Enter') {
+          if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
             event.preventDefault();
-            // Chuyển tới cùng cột ở dòng kế tiếp; hiện chưa bỏ qua dòng bị khóa.
-            document.getElementById(`meter-${rowIndex + 1}-${columnIndex}`)?.focus();
+            focusAdjacentInput(event.currentTarget, field, event.shiftKey);
           }
         }}
       />
-      {invalid && <small>Nhập số nguyên; chỉ số mới ≥ cũ</small>}
+      {error && <small id={errorId}>{error}</small>}
     </div>
   );
 }
 
-/** Hiển thị tiêu thụ và cảnh báo; dùng dấu gạch khi chưa tính được kết quả hợp lệ. */
+/** Hiển thị tiêu thụ và cảnh báo bằng chữ; dữ liệu chưa hợp lệ không tạo tiêu thụ giả. */
 export function ConsumptionCell({ row, kind }: { row: EditableMeterRow; kind: MeterKind }) {
   const consumption = getConsumption(row, kind);
   if (!consumption) return '—';
-
   return (
     <div>
       {consumption.usage}

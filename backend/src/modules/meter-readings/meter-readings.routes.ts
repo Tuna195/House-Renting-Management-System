@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { prisma } from '../../lib/prisma';
 import { currentUser, requireAuth, requireRole } from '../../middlewares/auth';
 import { AppError } from '../../utils/app-error';
+import { validationError } from '../../utils/api-errors';
 import { bulkMeterReadingsSchema, meterReadingsQuerySchema } from './meter-readings.schema';
 
 /**
@@ -21,7 +22,7 @@ router.use(requireAuth, requireRole('LANDLORD'));
 /** Trả mỗi phòng đủ điều kiện một dòng, kèm bản ghi kỳ này, kỳ trước gần nhất và trạng thái khóa. */
 router.get('/', async (req, res) => {
   const parsed = meterReadingsQuerySchema.safeParse(req.query);
-  if (!parsed.success) throw new AppError(400, 'Tham số không hợp lệ', parsed.error.issues);
+  if (!parsed.success) throw validationError(parsed.error.issues, 'Tham số không hợp lệ');
   const { buildingId, period } = parsed.data;
   // Danh tính lấy từ auth, không nhận ownerId do client cung cấp.
   const ownerId = currentUser(req).id;
@@ -41,7 +42,7 @@ router.get('/', async (req, res) => {
 /** Tạo hoặc cập nhật chỉ số theo khóa phòng/kỳ; một dòng lỗi sẽ hủy toàn bộ lô. */
 router.put('/bulk', async (req, res) => {
   const parsed = bulkMeterReadingsSchema.safeParse(req.body);
-  if (!parsed.success) throw new AppError(400, 'Chỉ số không hợp lệ', parsed.error.issues);
+  if (!parsed.success) throw validationError(parsed.error.issues, 'Chỉ số không hợp lệ');
   const { buildingId, period, readings } = parsed.data;
   // Danh tính lấy từ auth, không nhận ownerId do client cung cấp.
   const ownerId = currentUser(req).id;
@@ -49,10 +50,10 @@ router.put('/bulk', async (req, res) => {
   // Luồng phát hành hóa đơn tương lai cần phối hợp khóa/transaction; hiện chưa retry xung đột.
   await prisma.$transaction(async (tx) => {
     if (!await tx.building.findFirst({ where: { id: buildingId, ownerId } })) throw new AppError(404, 'Không tìm thấy tòa nhà');
-    for (const r of readings) {
-      if (!await tx.room.findFirst({ where: { id: r.roomId, buildingId, building: { ownerId }, contracts: { some: eligible(period) } } })) throw new AppError(400, 'Phòng không hợp lệ', { roomId: r.roomId });
+    for (const [index, r] of readings.entries()) {
+      if (!await tx.room.findFirst({ where: { id: r.roomId, buildingId, building: { ownerId }, contracts: { some: eligible(period) } } })) throw new AppError(400, 'Phòng không hợp lệ', [{ path: ['readings', index, 'roomId'], code: 'INVALID_ROOM', message: 'Phòng không thuộc tòa nhà hoặc không có hợp đồng trong kỳ', roomId: r.roomId }], 'VALIDATION_ERROR');
       // Hóa đơn từng phát hành (issuedAt) hoặc đang thu/đã thu tiền đều khóa chỉnh sửa.
-      if (await tx.invoice.findFirst({ where: { period, contract: { roomId: r.roomId }, OR: [{ issuedAt: { not: null } }, { status: { in: ['UNPAID', 'PARTIAL', 'PAID'] } }] } })) throw new AppError(409, 'Kỳ đã phát hành hóa đơn', { roomId: r.roomId });
+      if (await tx.invoice.findFirst({ where: { period, contract: { roomId: r.roomId }, OR: [{ issuedAt: { not: null } }, { status: { in: ['UNPAID', 'PARTIAL', 'PAID'] } }] } })) throw new AppError(409, 'Kỳ đã phát hành hóa đơn', [{ path: ['readings', index], code: 'PERIOD_LOCKED', message: 'Phòng đã phát hành hóa đơn, không thể sửa chỉ số', roomId: r.roomId }], 'PERIOD_LOCKED');
       // Cập nhật người ghi và thời điểm ghi kể cả khi sửa bản ghi đã có.
       const data = { ...r, period, recordedById: ownerId, recordedAt: new Date() };
       await tx.meterReading.upsert({ where: { roomId_period: { roomId: r.roomId, period } }, create: data, update: data });

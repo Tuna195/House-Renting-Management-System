@@ -8,6 +8,7 @@ export class AppError extends Error {
     public status: number,
     message: string,
     public details?: unknown,
+    public code?: string,
   ) {
     super(message);
   }

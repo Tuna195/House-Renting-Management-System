@@ -19,8 +19,11 @@ Validation cú pháp không thay cho kiểm tra tòa nhà/phòng thuộc chủ n
 - Rooms dùng cùng schema cho buildingId trong query/body; buildings/rooms/tenants dùng helper path chung,
   bao gồm route tạo tài khoản khách thuê trước đây gọi Number trực tiếp.
 
-JSON lỗi giữ hợp đồng hiện có `{ message, details }`; path và Meter Readings trả chi tiết có `path`, `code`, `message`.
-Middleware body của module cũ vẫn giữ cấu trúc fieldErrors hiện có để tránh đổi hợp đồng ngoài phạm vi.
+JSON lỗi dùng `{ code, message, details }`; validation ở path, query và body trả mảng chi tiết có
+`path`, `code`, `message`. Đây là thay đổi có chủ đích: `details` từ middleware body trước đây là
+object fieldErrors, nay là mảng để giữ được vị trí nested và nhất quán giữa các API.
+Client đọc `message` vẫn tương thích; client đọc fieldErrors cần chuyển sang path.
+Không trả nguyên metadata Prisma hoặc Zod issue trong response lỗi.
 
 | Trường hợp | HTTP |
 |---|---|
