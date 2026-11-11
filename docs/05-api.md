@@ -70,3 +70,50 @@ Socket.IO, cùng cổng với API. Kết nối kèm `auth: { token }`. Server ch
 | `notification:new` | `Notification` | Có thông báo mới cho user | ⬜ T9 |
 | `invoice:paid` | `{ invoiceId }` | Webhook gạch nợ xong | ⬜ T10 |
 | `maintenance:new` | `MaintenanceRequest` | Khách gửi yêu cầu mới (gửi cho chủ nhà) | ⬜ T10 |
+
+### Chỉ số điện nước
+
+`GET /api/meter-readings?buildingId=1&period=2026-10` (LANDLORD) trả mảng
+`{ room: { id, name }, current: MeterReading | null, previous: MeterReading | null, locked: boolean }`.
+`previous` là kỳ gần nhất nhỏ hơn kỳ chọn, không bắt buộc liên tiếp.
+Phòng có hợp đồng ACTIVE hoặc ENDED giao với tháng theo múi giờ Việt Nam; loại CANCELLED.
+Ngày kết thúc được tính bao gồm ngày đó. Chưa có lịch sử thì giao diện để trống.
+
+`PUT /api/meter-readings/bulk` nhận `{ buildingId, period, readings: [{ roomId, electricStart, electricEnd, waterStart, waterEnd }] }`, trả `{ saved: number }`.
+Chỉ số nguyên 0..2147483647. Lỗi 400 có `code: VALIDATION_ERROR`, `details` là mảng `{ path, code, message }` với path
+`readings/index/field`, hoặc path `readings/index/roomId` kèm `roomId` khi phòng không hợp lệ. Không có quyền tòa nhà trả 404.
+Hóa đơn có issuedAt hoặc trạng thái UNPAID/PARTIAL/PAID khóa ghi và trả 409 với `code: PERIOD_LOCKED`, details chứa path dòng và roomId.
+Transaction Serializable đảm bảo ghi cả lô nguyên tử; luồng phát hành hóa đơn tương lai
+cần phối hợp cùng cơ chế transaction/khóa và xử lý retry xung đột để tránh cuộc đua phát hành/ghi chỉ số.
+
+### Quy tắc ID tại biên HTTP
+
+ID query/path nhận chuỗi thập phân chuẩn từ `1` đến `2147483647`; ID trong JSON body nhận number nguyên
+trong cùng giới hạn. Không tự ép chuỗi/boolean/mảng thành ID. Sai định dạng hoặc vượt phạm vi trả **400**
+trước khi gọi Prisma; ID hợp lệ nhưng tài nguyên không tồn tại/không thuộc chủ nhà vẫn trả **404**.
+Ví dụ `buildingId=01`, `buildingId=1e3`, `buildingId=0x10`, `buildingId=2147483648` đều bị từ chối.
+Xem [thiết kế validation và phạm vi áp dụng](validation-boundaries.md).
+
+### Hợp đồng lỗi và nhập chỉ số
+
+Lỗi HTTP trả `{ code, message, details }`. `details` luôn có mặt; với validation là mảng
+`{ path: (string | number)[], code: string, message: string, roomId?: number }`, với lỗi không gắn trường là `[]`.
+`code` cấp response ổn định: VALIDATION_ERROR (400), INVALID_JSON (400), UNAUTHENTICATED (401),
+FORBIDDEN (403), NOT_FOUND (404), PERIOD_LOCKED/CONFLICT/WRITE_CONFLICT (409), INTERNAL_ERROR (500).
+Không trả metadata Prisma hay stack trace. `WRITE_CONFLICT` yêu cầu người dùng thử lại, không trả thành công giả.
+
+Ví dụ chỉ số điện cuối thấp hơn đầu:
+
+```json
+{"code":"VALIDATION_ERROR","message":"Chỉ số không hợp lệ","details":[{"path":["readings",0,"electricEnd"],"code":"custom","message":"Phòng 1: chỉ số mới nhỏ hơn chỉ số cũ"}]}
+```
+
+Frontend giữ nguyên chuỗi đang nhập, chỉ chuyển thành number khi cả dòng hợp lệ; không tự làm tròn
+số thập phân hoặc clamp số vượt giới hạn. Lỗi tại ô và khả năng lưu dùng chung một hàm kiểm tra.
+Lỗi phản hồi chỉ áp dụng cho bản nháp cùng scope/version với request đã gửi. Kỳ khóa trả 409 sẽ làm mới
+cache đúng tòa/tháng; bản nháp vẫn giữ để đối chiếu. Cảnh báo tiêu thụ không chặn lưu.
+Tab/Shift+Tab theo thứ tự DOM; Enter/Shift+Enter đi xuống/lên cùng cột và bỏ qua dòng khóa.
+Ở đầu/cuối cột giữ nguyên focus; không chuyển dòng khi đang nhập qua IME.
+
+**Thay đổi compatibility:** `details` validation từ middleware body trước đây là object fieldErrors,
+nay là mảng có path. Các client chỉ đọc message vẫn dùng được; client đọc fieldErrors phải cập nhật.

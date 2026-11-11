@@ -88,6 +88,7 @@ npm run dev                 # mở http://localhost:5173
 | backend | `npm run db:reset` | ⚠️ Xóa sạch DB, tạo lại bảng và seed lại |
 | frontend | `npm run dev` | Chạy giao diện |
 | frontend | `npm run build` | Kiểm tra lỗi TypeScript và build bản production |
+| frontend | `npm test` | Chạy regression frontend bằng Vitest, React Testing Library và jsdom |
 
 ---
 
@@ -141,3 +142,11 @@ quan-ly-tro/
 | Kéo code mới về bị lỗi thiếu bảng hoặc cột | Chạy `npm run db:migrate` (có người vừa sửa schema) |
 | Kéo code mới về bị lỗi thiếu thư viện | Chạy `npm install` ở thư mục đó |
 | Seed lỗi `has no equivalent in encoding "WIN1252"` | Chỉ gặp khi dùng PostgreSQL cài trên Windows: database phải tạo với encoding **UTF8** (`CREATE DATABASE ten_db ENCODING 'UTF8' TEMPLATE template0;`). Neon luôn là UTF8 |
+
+### Kiểm thử bản nháp chỉ số điện nước
+
+Chạy `npm --prefix frontend test` từ root. Test dùng API giả và promise điều khiển được để
+kiểm tra đổi tòa/tháng khi đang lưu, chỉnh sửa mới sau khi gửi, phản hồi ngược thứ tự,
+chặn request trùng cùng scope và giữ dữ liệu khi lưu thất bại; không cần kết nối database.
+Bản nháp được giữ riêng theo tòa nhà/tháng trong phiên mở trang, không lưu qua reload hoặc rời trang.
+Khóa request chỉ áp dụng trong trang hiện tại; không thay thế kiểm soát ghi đồng thời giữa nhiều tab/tài khoản ở backend.

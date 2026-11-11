@@ -1,3 +1,4 @@
+import meterRoutes from './modules/meter-readings/meter-readings.routes';
 import { Router } from 'express';
 import authRoutes from './modules/auth/auth.routes';
 import buildingRoutes from './modules/buildings/buildings.routes';
@@ -15,6 +16,7 @@ api.use('/auth', authRoutes);
 api.use('/buildings', buildingRoutes);
 api.use('/tenants', tenantRoutes);
 api.use('/rooms', roomRoutes);
+api.use('/meter-readings', meterRoutes);
 
 // TODO — các module sẽ thêm (xem docs/05-api.md để biết ai phụ trách):
 // api.use('/services', serviceRoutes);            // TV1 — Tuần 4
