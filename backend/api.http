@@ -137,3 +137,26 @@ Content-Type: application/json
 ### Danh sách phòng của B → mảng rỗng
 GET {{baseUrl}}/rooms
 Authorization: Bearer {{tokenB}}
+
+### Bảng chỉ số (dùng token chủ nhà)
+GET http://localhost:4000/api/meter-readings?buildingId=1&period=2026-10
+Authorization: Bearer {{token}}
+
+### Lưu chỉ số
+PUT http://localhost:4000/api/meter-readings/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"buildingId":1,"period":"2026-10","readings":[{"roomId":1,"electricStart":100,"electricEnd":120,"waterStart":10,"waterEnd":15}]}
+
+### ID vượt Int32 → 400, không truy vấn database
+GET {{baseUrl}}/meter-readings?buildingId=2147483648&period=2026-10
+Authorization: Bearer {{token}}
+
+### ID dạng số mũ → 400, không diễn giải thành tòa nhà 1000
+GET {{baseUrl}}/meter-readings?buildingId=1e3&period=2026-10
+Authorization: Bearer {{token}}
+
+### Query ID lặp → 400
+GET {{baseUrl}}/meter-readings?buildingId=1&buildingId=2&period=2026-10
+Authorization: Bearer {{token}}

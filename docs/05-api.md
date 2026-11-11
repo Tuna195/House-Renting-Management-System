@@ -70,3 +70,26 @@ Socket.IO, cùng cổng với API. Kết nối kèm `auth: { token }`. Server ch
 | `notification:new` | `Notification` | Có thông báo mới cho user | ⬜ T9 |
 | `invoice:paid` | `{ invoiceId }` | Webhook gạch nợ xong | ⬜ T10 |
 | `maintenance:new` | `MaintenanceRequest` | Khách gửi yêu cầu mới (gửi cho chủ nhà) | ⬜ T10 |
+
+### Chỉ số điện nước
+
+`GET /api/meter-readings?buildingId=1&period=2026-10` (LANDLORD) trả mảng
+`{ room: { id, name }, current: MeterReading | null, previous: MeterReading | null, locked: boolean }`.
+`previous` là kỳ gần nhất nhỏ hơn kỳ chọn, không bắt buộc liên tiếp.
+Phòng có hợp đồng ACTIVE hoặc ENDED giao với tháng theo múi giờ Việt Nam; loại CANCELLED.
+Ngày kết thúc được tính bao gồm ngày đó. Chưa có lịch sử thì giao diện để trống.
+
+`PUT /api/meter-readings/bulk` nhận `{ buildingId, period, readings: [{ roomId, electricStart, electricEnd, waterStart, waterEnd }] }`, trả `{ saved: number }`.
+Chỉ số nguyên 0..2147483647. Lỗi 400 có `details` là Zod issues với path
+`readings/index/field`, hoặc `{ roomId }` khi phòng không hợp lệ. Không có quyền tòa nhà trả 404.
+Hóa đơn có issuedAt hoặc trạng thái UNPAID/PARTIAL/PAID khóa ghi và trả 409 cùng roomId.
+Transaction Serializable đảm bảo ghi cả lô nguyên tử; luồng phát hành hóa đơn tương lai
+cần phối hợp cùng cơ chế transaction/khóa và xử lý retry xung đột để tránh cuộc đua phát hành/ghi chỉ số.
+
+### Quy tắc ID tại biên HTTP
+
+ID query/path nhận chuỗi thập phân chuẩn từ `1` đến `2147483647`; ID trong JSON body nhận number nguyên
+trong cùng giới hạn. Không tự ép chuỗi/boolean/mảng thành ID. Sai định dạng hoặc vượt phạm vi trả **400**
+trước khi gọi Prisma; ID hợp lệ nhưng tài nguyên không tồn tại/không thuộc chủ nhà vẫn trả **404**.
+Ví dụ `buildingId=01`, `buildingId=1e3`, `buildingId=0x10`, `buildingId=2147483648` đều bị từ chối.
+Xem [thiết kế validation và phạm vi áp dụng](validation-boundaries.md).
