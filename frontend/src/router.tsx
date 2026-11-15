@@ -5,6 +5,8 @@ import { RequireAuth } from './features/auth/RequireAuth';
 import BuildingsPage from './features/buildings/BuildingsPage';
 import TenantsPage from './features/tenants/TenantsPage';
 import RoomsPage from './features/rooms/RoomsPage';
+import RoomDetailPage from './features/rooms/RoomDetailPage';
+import ServicesPage from './features/services/ServicesPage';
 import { AppLayout } from './layouts/AppLayout';
 import { landlordNav, tenantNav, type NavItem } from './navigation';
 import ComingSoonPage from './pages/ComingSoonPage';
@@ -36,6 +38,8 @@ export const router = createBrowserRouter([
       { path: 'tenants', element: <TenantsPage /> },
       // Thêm trang thật ở đây, VD: { path: 'rooms', element: <RoomsPage /> },
       { path: 'rooms', element: <RoomsPage /> },
+      { path: 'rooms/:id', element: <RoomDetailPage /> },
+      { path: 'services', element: <ServicesPage /> },
       // Thêm trang thật ở đây
       ...comingSoonRoutes(landlordNav),
     ],
@@ -58,4 +62,3 @@ export const router = createBrowserRouter([
 
   { path: '*', element: <NotFoundPage /> },
 ]);
-

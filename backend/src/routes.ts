@@ -3,6 +3,7 @@ import authRoutes from './modules/auth/auth.routes';
 import buildingRoutes from './modules/buildings/buildings.routes';
 import tenantRoutes from './modules/tenants/tenants.routes';
 import roomRoutes from './modules/rooms/rooms.routes';
+import serviceRoutes from './modules/services/services.routes';
 
 import portalRoutes from './modules/portal/portal.routes';
 
@@ -17,10 +18,10 @@ api.use('/auth', authRoutes);
 api.use('/buildings', buildingRoutes);
 api.use('/tenants', tenantRoutes);
 api.use('/rooms', roomRoutes);
+api.use('/services', serviceRoutes); // TV1 — Tuần 4
 api.use('/portal', portalRoutes); // TV4 — Tuần 3 (Cổng khách thuê: Báo sự cố, Tuần 5 thêm HĐ, hóa đơn)
 
 // TODO — các module sẽ thêm (xem docs/05-api.md để biết ai phụ trách):
-// api.use('/services', serviceRoutes);            // TV1 — Tuần 4
 // api.use('/contracts', contractRoutes);          // TV2 — Tuần 4
 // api.use('/meter-readings', meterReadingRoutes); // TV3 — Tuần 4
 // api.use('/invoices', invoiceRoutes);            // TV3 — Tuần 5

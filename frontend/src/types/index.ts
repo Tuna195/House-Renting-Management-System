@@ -86,7 +86,77 @@ export type RoomInput = Pick<Room, 'buildingId' | 'name' | 'baseRent' | 'maxOccu
 // Khi sửa: không đổi được tòa nhà; trạng thái chỉ đổi tay giữa Trống ↔ Sửa chữa
 export type RoomUpdateInput = Partial<Omit<RoomInput, 'buildingId'>> & { status?: Exclude<RoomStatus, 'OCCUPIED'> };
 
-// TODO: thêm Tenant, Contract, MeterReading, Invoice... khi làm các module tương ứng
+export type ServiceUnit = 'PER_ROOM' | 'PER_PERSON' | 'PER_QUANTITY';
+
+export interface Service {
+  id: number;
+  buildingId: number;
+  name: string;
+  price: number;
+  unit: ServiceUnit;
+  isActive: boolean;
+  createdAt: string;
+  _count?: { contractServices: number }; // số hợp đồng đang dùng dịch vụ này
+}
+
+export type ServiceInput = Pick<Service, 'buildingId' | 'name' | 'price' | 'unit'> & { isActive?: boolean };
+
+// Khi sửa: không đổi được tòa nhà
+export type ServiceUpdateInput = Partial<Omit<ServiceInput, 'buildingId'>>;
+
+/** Kết quả DELETE /services/:id khi dịch vụ đã dùng → chỉ ẩn, không xóa */
+export interface ServiceArchivedResult {
+  archived: true;
+  service: Service;
+}
+
+export type ContractStatus = 'ACTIVE' | 'ENDED' | 'CANCELLED';
+
+export interface ContractTenant {
+  tenantId: number;
+  isPrimary: boolean;
+  tenant?: Pick<Tenant, 'id' | 'fullName' | 'phone'>;
+}
+
+export interface ContractService {
+  serviceId: number;
+  quantity: number;
+  service?: Service;
+}
+
+export interface Contract {
+  id: number;
+  roomId: number;
+  startDate: string;
+  endDate: string | null;
+  rentPrice: number;
+  deposit: number;
+  status: ContractStatus;
+  room?: Pick<Room, 'id' | 'name'> & { building?: Pick<Building, 'id' | 'name'> };
+  tenants?: ContractTenant[];
+  services?: ContractService[];
+}
+
+export interface MeterReading {
+  id: number;
+  roomId: number;
+  period: string; // "YYYY-MM"
+  electricStart: number;
+  electricEnd: number;
+  waterStart: number;
+  waterEnd: number;
+  recordedAt: string;
+  note: string | null;
+}
+
+/** GET /rooms/:id — phòng kèm hợp đồng đang hiệu lực và 6 kỳ chỉ số gần nhất */
+export interface RoomDetail extends Omit<Room, 'building'> {
+  building: Pick<Building, 'id' | 'name' | 'address'>;
+  currentContract: Contract | null;
+  meterReadings: MeterReading[];
+  _count: { contracts: number };
+}
+
 // -----------------------------------------------------------------------------
 // TV4 — SỰ CỐ & CỔNG KHÁCH THUÊ
 // -----------------------------------------------------------------------------
