@@ -96,6 +96,18 @@ export interface Service {
   unit: ServiceUnit;
   isActive: boolean;
   createdAt: string;
+  _count?: { contractServices: number }; // số hợp đồng đang dùng dịch vụ này
+}
+
+export type ServiceInput = Pick<Service, 'buildingId' | 'name' | 'price' | 'unit'> & { isActive?: boolean };
+
+// Khi sửa: không đổi được tòa nhà
+export type ServiceUpdateInput = Partial<Omit<ServiceInput, 'buildingId'>>;
+
+/** Kết quả DELETE /services/:id khi dịch vụ đã dùng → chỉ ẩn, không xóa */
+export interface ServiceArchivedResult {
+  archived: true;
+  service: Service;
 }
 
 export type ContractStatus = 'ACTIVE' | 'ENDED' | 'CANCELLED';
@@ -125,15 +137,24 @@ export interface Contract {
   services?: ContractService[];
 }
 
-export interface ContractInput {
+export interface MeterReading {
+  id: number;
   roomId: number;
-  startDate: string;
-  endDate?: string;
-  rentPrice: number;
-  deposit: number;
-  tenantIds: number[];
-  primaryTenantId: number;
-  services: { serviceId: number; quantity: number }[];
+  period: string; // "YYYY-MM"
+  electricStart: number;
+  electricEnd: number;
+  waterStart: number;
+  waterEnd: number;
+  recordedAt: string;
+  note: string | null;
+}
+
+/** GET /rooms/:id — phòng kèm hợp đồng đang hiệu lực và 6 kỳ chỉ số gần nhất */
+export interface RoomDetail extends Omit<Room, 'building'> {
+  building: Pick<Building, 'id' | 'name' | 'address'>;
+  currentContract: Contract | null;
+  meterReadings: MeterReading[];
+  _count: { contracts: number };
 }
 
 // -----------------------------------------------------------------------------

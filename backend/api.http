@@ -165,3 +165,63 @@ Content-Type: application/json
   "description": "Vòi bị rỉ nước liên tục từ tối qua, vặn chặt van vẫn nhỏ giọt. Nhờ chủ nhà gọi thợ qua sớm giúp mình."
 }
 
+
+# ============================================================
+# DỊCH VỤ (TV1 — Tuần 4)
+# ============================================================
+
+### Danh sách dịch vụ của tòa nhà 1 (kèm _count.contractServices = số hợp đồng đang dùng)
+GET {{baseUrl}}/services?buildingId=1
+Authorization: Bearer {{token}}
+
+### Tham số sai → 400
+GET {{baseUrl}}/services?buildingId=abc
+Authorization: Bearer {{token}}
+
+### Tạo dịch vụ
+# @name createService
+POST {{baseUrl}}/services
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "buildingId": 1, "name": "Gửi xe đạp điện", "price": 80000, "unit": "PER_QUANTITY" }
+
+### Tạo trùng tên với dịch vụ đang hoạt động → 409
+POST {{baseUrl}}/services
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "buildingId": 1, "name": "gửi xe đạp điện", "price": 1000 }
+
+### Dữ liệu sai (giá âm, đơn vị lạ) → 400
+POST {{baseUrl}}/services
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "buildingId": 1, "name": "", "price": -5, "unit": "PER_DAY" }
+
+### Sửa dịch vụ (không đổi được buildingId)
+PATCH {{baseUrl}}/services/{{createService.response.body.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "price": 100000 }
+
+### Xóa dịch vụ CHƯA dùng → 204, xóa hẳn
+DELETE {{baseUrl}}/services/{{createService.response.body.id}}
+Authorization: Bearer {{token}}
+
+### Xóa dịch vụ ĐÃ dùng trong hợp đồng (seed) → 200 { archived: true }, chỉ ẩn
+DELETE {{baseUrl}}/services/1
+Authorization: Bearer {{token}}
+
+### Bật lại dịch vụ đã ẩn
+PATCH {{baseUrl}}/services/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "isActive": true }
+
+### Chi tiết phòng: hợp đồng hiện tại (người ở, dịch vụ) + 6 kỳ chỉ số gần nhất
+GET {{baseUrl}}/rooms/1
+Authorization: Bearer {{token}}
