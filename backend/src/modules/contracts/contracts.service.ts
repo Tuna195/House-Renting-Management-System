@@ -76,6 +76,15 @@ export async function createContract(ownerId: number, input: CreateContractInput
       }
     }
 
+    // Chỉ một transaction có thể chuyển phòng từ VACANT sang OCCUPIED.
+    const claimedRoom = await tx.room.updateMany({
+      where: { id: input.roomId, status: 'VACANT' },
+      data: { status: 'OCCUPIED' },
+    });
+    if (claimedRoom.count !== 1) {
+      throw new AppError(409, 'Phòng này hiện không còn trống để tạo hợp đồng');
+    }
+
     // 6. Tạo hợp đồng và các bảng liên quan
     const contract = await tx.contract.create({
       data: {
@@ -105,12 +114,6 @@ export async function createContract(ownerId: number, input: CreateContractInput
       },
     });
 
-    // 7. Cập nhật trạng thái phòng thành OCCUPIED
-    await tx.room.update({
-      where: { id: input.roomId },
-      data: { status: 'OCCUPIED' },
-    });
-
     return contract;
   });
 }
@@ -122,6 +125,9 @@ export async function updateContract(ownerId: number, id: number, input: UpdateC
       where: { id, room: { building: { ownerId } } },
     });
     if (!contract) throw notFound('Hợp đồng');
+    if (input.endDate && input.endDate < contract.startDate) {
+      throw new AppError(400, 'Ngày kết thúc phải từ ngày bắt đầu trở đi');
+    }
 
     // 2. Nếu có cập nhật dịch vụ, xử lý xóa cũ tạo mới (hoặc update tùy logic)
     // Ở đây dùng cách đơn giản: Xóa hết dịch vụ cũ, tạo lại dịch vụ mới nếu có gửi lên
