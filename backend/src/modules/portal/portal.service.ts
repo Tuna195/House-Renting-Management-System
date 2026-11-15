@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma';
 import { AppError } from '../../utils/app-error';
+import { notify } from '../notifications/notifications.service';
 import type { CreateMaintenanceInput } from './portal.schema';
 
 /**
@@ -66,7 +67,7 @@ export async function listMyMaintenance(userId: number) {
 export async function createMaintenance(userId: number, input: CreateMaintenanceInput) {
   const contract = await getActiveContractOfUser(userId);
 
-  return prisma.maintenanceRequest.create({
+  const created = await prisma.maintenanceRequest.create({
     data: {
       title: input.title,
       description: input.description,
@@ -81,10 +82,24 @@ export async function createMaintenance(userId: number, input: CreateMaintenance
           id: true,
           name: true,
           building: {
-            select: { id: true, name: true, address: true },
+            select: { id: true, name: true, address: true, ownerId: true },
           },
         },
       },
     },
   });
+
+  // 🔔 Tự động bắn thông báo cho chủ nhà
+  try {
+    const ownerId = created.room.building.ownerId;
+    await notify(ownerId, {
+      title: `⚠️ Sự cố mới phòng ${created.room.name}`,
+      body: `Khách báo: ${input.title}. Nhấn để xem và xử lý.`,
+      link: '/maintenance',
+    });
+  } catch (err) {
+    console.error('Lỗi gửi thông báo cho chủ nhà:', err);
+  }
+
+  return created;
 }

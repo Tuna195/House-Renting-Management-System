@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { App, Button, Card, Popconfirm, Select, Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { buildingsApi } from '../../api/buildings';
 import { getErrorMessage } from '../../api/client';
 import { roomsApi } from '../../api/rooms';
@@ -69,10 +70,12 @@ export default function RoomsPage() {
     {
       title: 'Phòng',
       dataIndex: 'name',
-      // Đang xem tất cả tòa nhà thì hiện thêm tên tòa nhà cho dễ phân biệt
+      // Bấm tên phòng → trang chi tiết. Đang xem tất cả tòa nhà thì hiện thêm tên tòa nhà cho dễ phân biệt
       render: (name: string, r) => (
         <>
-          <b>{name}</b>
+          <Link to={`/rooms/${r.id}`}>
+            <b>{name}</b>
+          </Link>
           {!buildingId && r.building && (
             <>
               <br />

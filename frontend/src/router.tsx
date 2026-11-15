@@ -1,3 +1,4 @@
+import MeterReadingsPage from './features/meter-readings/MeterReadingsPage';
 import { createBrowserRouter, type RouteObject } from 'react-router-dom';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
@@ -5,6 +6,9 @@ import { RequireAuth } from './features/auth/RequireAuth';
 import BuildingsPage from './features/buildings/BuildingsPage';
 import TenantsPage from './features/tenants/TenantsPage';
 import RoomsPage from './features/rooms/RoomsPage';
+import ContractsPage from './features/contracts/ContractsPage';
+import RoomDetailPage from './features/rooms/RoomDetailPage';
+import ServicesPage from './features/services/ServicesPage';
 import { AppLayout } from './layouts/AppLayout';
 import { landlordNav, tenantNav, type NavItem } from './navigation';
 import ComingSoonPage from './pages/ComingSoonPage';
@@ -12,7 +16,8 @@ import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 import TenantHomePage from './pages/TenantHomePage';
 
-import MaintenancePage from './features/portal/MaintenancePage';
+import TenantMaintenancePage from './features/portal/MaintenancePage';
+import LandlordMaintenancePage from './features/maintenance/MaintenancePage';
 
 // Tự tạo route "Đang phát triển" cho các mục menu chưa làm (có owner trong navigation.tsx)
 const comingSoonRoutes = (nav: NavItem[]): RouteObject[] =>
@@ -34,9 +39,13 @@ export const router = createBrowserRouter([
       { index: true, element: <DashboardPage /> },
       { path: 'buildings', element: <BuildingsPage /> },
       { path: 'tenants', element: <TenantsPage /> },
-      // Thêm trang thật ở đây, VD: { path: 'rooms', element: <RoomsPage /> },
       { path: 'rooms', element: <RoomsPage /> },
+      { path: 'contracts', element: <ContractsPage /> },
+      { path: 'rooms/:id', element: <RoomDetailPage /> },
+      { path: 'services', element: <ServicesPage /> },
+      { path: 'meter-readings', element: <MeterReadingsPage /> },
       // Thêm trang thật ở đây
+      { path: 'maintenance', element: <LandlordMaintenancePage /> }, // TV4 — Tuần 4
       ...comingSoonRoutes(landlordNav),
     ],
   },
@@ -51,11 +60,10 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <TenantHomePage /> },
-      { path: 'maintenance', element: <MaintenancePage /> },
+      { path: 'maintenance', element: <TenantMaintenancePage /> },
       ...comingSoonRoutes(tenantNav),
     ],
   },
 
   { path: '*', element: <NotFoundPage /> },
 ]);
-

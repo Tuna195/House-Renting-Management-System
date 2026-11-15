@@ -1,6 +1,6 @@
 // Nhãn và màu Tag cho các trạng thái — dùng chung cho mọi trang để hiển thị thống nhất.
 // Thêm trạng thái của module khác (sự cố, hóa đơn...) vào cuối file này.
-import type { RoomStatus } from '../types';
+import type { RoomStatus, ServiceUnit } from '../types';
 
 interface StatusDisplay {
   label: string;
@@ -48,3 +48,23 @@ export const maintenanceStatusMap: Record<MaintenanceStatus, StatusConfig> = {
     badgeStatus: 'error',
   },
 };
+
+// -----------------------------------------------------------------------------
+// TV1 — Đơn vị tính dịch vụ
+// -----------------------------------------------------------------------------
+
+interface ServiceUnitDisplay {
+  label: string; // tên đầy đủ, dùng trong Select
+  suffix: string; // hậu tố sau giá: "50.000 ₫/phòng"
+}
+
+export const SERVICE_UNIT: Record<ServiceUnit, ServiceUnitDisplay> = {
+  PER_ROOM: { label: 'Theo phòng', suffix: '/phòng' },
+  PER_PERSON: { label: 'Theo người', suffix: '/người' },
+  PER_QUANTITY: { label: 'Theo số lượng (VD: xe)', suffix: '/xe (số lượng)' },
+};
+
+export const SERVICE_UNIT_OPTIONS = (Object.keys(SERVICE_UNIT) as ServiceUnit[]).map((value) => ({
+  value,
+  label: `${SERVICE_UNIT[value].label} — ${SERVICE_UNIT[value].suffix}`,
+}));
