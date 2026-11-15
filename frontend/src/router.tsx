@@ -6,6 +6,7 @@ import BuildingsPage from './features/buildings/BuildingsPage';
 import TenantsPage from './features/tenants/TenantsPage';
 import RoomsPage from './features/rooms/RoomsPage';
 import RoomDetailPage from './features/rooms/RoomDetailPage';
+import RoomMapPage from './features/rooms/RoomMapPage';
 import ServicesPage from './features/services/ServicesPage';
 import { AppLayout } from './layouts/AppLayout';
 import { landlordNav, tenantNav, type NavItem } from './navigation';
@@ -39,6 +40,7 @@ export const router = createBrowserRouter([
       // Thêm trang thật ở đây, VD: { path: 'rooms', element: <RoomsPage /> },
       { path: 'rooms', element: <RoomsPage /> },
       { path: 'rooms/:id', element: <RoomDetailPage /> },
+      { path: 'room-map', element: <RoomMapPage /> },
       { path: 'services', element: <ServicesPage /> },
       // Thêm trang thật ở đây
       ...comingSoonRoutes(landlordNav),

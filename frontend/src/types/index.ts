@@ -53,6 +53,7 @@ export type Tenant = {
   note: string | null;
   createdAt: string;
   updatedAt: string;
+  currentRoom?: { id: number; name: string } | null; // phòng đang ở (GET /tenants)
 };
 
 // Dữ liệu gửi lên khi tạo/sửa (không có id, ownerId, userId, createdAt...)
@@ -76,6 +77,9 @@ export interface Room {
   status: RoomStatus;
   createdAt: string;
   building?: Pick<Building, 'id' | 'name'>;
+  // Chỉ có ở GET /rooms (danh sách): người đại diện HĐ đang hiệu lực, có hóa đơn quá hạn không
+  primaryTenant?: Pick<Tenant, 'id' | 'fullName' | 'phone'> | null;
+  hasOverdueInvoice?: boolean;
 }
 
 export type RoomInput = Pick<Room, 'buildingId' | 'name' | 'baseRent' | 'maxOccupants'> & {

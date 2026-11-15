@@ -6,16 +6,51 @@ import type { CreateRoomInput, ListRoomsQuery, UpdateRoomInput } from './rooms.s
 // Phòng KHÔNG có ownerId → kiểm tra quyền gián tiếp qua tòa nhà: room.building.ownerId.
 // Mọi truy vấn đều phải có điều kiện `building: { ownerId }`.
 
-export function listRooms(ownerId: number, query: ListRoomsQuery) {
-  return prisma.room.findMany({
-    where: {
-      building: { ownerId },
-      ...(query.buildingId && { buildingId: query.buildingId }),
-      ...(query.status && { status: query.status }),
-    },
-    orderBy: [{ buildingId: 'asc' }, { name: 'asc' }],
-    include: { building: { select: { id: true, name: true } } },
-  });
+// Hóa đơn đã phát hành, chưa thu đủ và đã qua hạn đóng → "quá hạn".
+// Schema không có trạng thái OVERDUE riêng: quá hạn = UNPAID/PARTIAL + dueDate < hiện tại.
+const overdueInvoiceWhere = () => ({
+  status: { in: ['UNPAID' as const, 'PARTIAL' as const] },
+  dueDate: { lt: new Date() },
+});
+
+export async function listRooms(ownerId: number, query: ListRoomsQuery) {
+  const where = {
+    building: { ownerId },
+    ...(query.buildingId && { buildingId: query.buildingId }),
+    ...(query.status && { status: query.status }),
+  };
+
+  const [rooms, overdue] = await Promise.all([
+    prisma.room.findMany({
+      where,
+      orderBy: [{ buildingId: 'asc' }, { name: 'asc' }],
+      include: {
+        building: { select: { id: true, name: true } },
+        // Người đại diện của hợp đồng đang hiệu lực (dùng cho Sơ đồ phòng và bảng Phòng)
+        contracts: {
+          where: { status: 'ACTIVE' },
+          select: {
+            tenants: {
+              where: { isPrimary: true },
+              select: { tenant: { select: { id: true, fullName: true, phone: true } } },
+            },
+          },
+        },
+      },
+    }),
+    // Một truy vấn lấy luôn các phòng có hóa đơn quá hạn (kể cả của hợp đồng cũ chưa trả hết)
+    prisma.invoice.findMany({
+      where: { ...overdueInvoiceWhere(), contract: { room: where } },
+      select: { contract: { select: { roomId: true } } },
+    }),
+  ]);
+
+  const overdueRoomIds = new Set(overdue.map((i) => i.contract.roomId));
+  return rooms.map(({ contracts, ...room }) => ({
+    ...room,
+    primaryTenant: contracts[0]?.tenants[0]?.tenant ?? null,
+    hasOverdueInvoice: overdueRoomIds.has(room.id),
+  }));
 }
 
 export async function getRoom(ownerId: number, id: number) {

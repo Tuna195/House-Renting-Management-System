@@ -3,9 +3,9 @@
 // còn invalidateQueries(['rooms']) làm mới MỌI danh sách phòng đã cache.
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { App, Button, Card, Popconfirm, Select, Space, Table, Tag } from 'antd';
+import { App, Button, Card, Input, Popconfirm, Select, Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { buildingsApi } from '../../api/buildings';
 import { getErrorMessage } from '../../api/client';
@@ -13,6 +13,7 @@ import { roomsApi } from '../../api/rooms';
 import type { Room, RoomStatus } from '../../types';
 import { formatVND } from '../../utils/format';
 import { ROOM_STATUS, ROOM_STATUS_OPTIONS } from '../../utils/status';
+import { compareNumber, compareText, matchesKeyword } from '../../utils/table';
 import { RoomFormModal, type RoomFormValues } from './RoomFormModal';
 
 export default function RoomsPage() {
@@ -22,6 +23,8 @@ export default function RoomsPage() {
   // Bộ lọc: undefined = tất cả
   const [buildingId, setBuildingId] = useState<number>();
   const [status, setStatus] = useState<RoomStatus>();
+  // Tìm theo tên phòng / người đại diện — lọc ngay trên trình duyệt (số phòng của một chủ nhà không nhiều)
+  const [keyword, setKeyword] = useState('');
 
   // null = modal đóng; 'new' = đang thêm mới; Room = đang sửa phòng đó
   const [editing, setEditing] = useState<Room | 'new' | null>(null);
@@ -32,6 +35,10 @@ export default function RoomsPage() {
     queryKey: ['rooms', buildingId, status],
     queryFn: () => roomsApi.list({ buildingId, status }),
   });
+  const filtered = useMemo(
+    () => data.filter((r) => matchesKeyword(keyword, r.name, r.primaryTenant?.fullName, r.primaryTenant?.phone)),
+    [data, keyword],
+  );
 
   // Phòng thay đổi thì số phòng ở trang Tòa nhà cũng đổi → làm mới cả hai
   const refresh = () => {
@@ -70,6 +77,7 @@ export default function RoomsPage() {
     {
       title: 'Phòng',
       dataIndex: 'name',
+      sorter: (a, b) => compareText(a.name, b.name), // "P2" trước "P10"
       // Bấm tên phòng → trang chi tiết. Đang xem tất cả tòa nhà thì hiện thêm tên tòa nhà cho dễ phân biệt
       render: (name: string, r) => (
         <>
@@ -85,14 +93,58 @@ export default function RoomsPage() {
         </>
       ),
     },
-    { title: 'Tầng', dataIndex: 'floor', align: 'center', render: (v: number | null) => v ?? '—' },
-    { title: 'Diện tích', dataIndex: 'area', align: 'center', render: (v: number | null) => (v ? `${v} m²` : '—') },
-    { title: 'Giá thuê', dataIndex: 'baseRent', render: (v: number) => formatVND(v) },
-    { title: 'Tối đa', dataIndex: 'maxOccupants', align: 'center', render: (v: number) => `${v} người` },
+    {
+      title: 'Tầng',
+      dataIndex: 'floor',
+      align: 'center',
+      sorter: (a, b) => compareNumber(a.floor, b.floor),
+      render: (v: number | null) => v ?? '—',
+    },
+    {
+      title: 'Diện tích',
+      dataIndex: 'area',
+      align: 'center',
+      sorter: (a, b) => compareNumber(a.area, b.area),
+      render: (v: number | null) => (v ? `${v} m²` : '—'),
+    },
+    {
+      title: 'Giá thuê',
+      dataIndex: 'baseRent',
+      sorter: (a, b) => a.baseRent - b.baseRent,
+      render: (v: number) => formatVND(v),
+    },
+    {
+      title: 'Tối đa',
+      dataIndex: 'maxOccupants',
+      align: 'center',
+      sorter: (a, b) => a.maxOccupants - b.maxOccupants,
+      render: (v: number) => `${v} người`,
+    },
+    {
+      title: 'Người đại diện',
+      dataIndex: 'primaryTenant',
+      sorter: (a, b) => compareText(a.primaryTenant?.fullName, b.primaryTenant?.fullName),
+      render: (_, r) =>
+        r.primaryTenant ? (
+          <>
+            {r.primaryTenant.fullName}
+            <br />
+            <small>{r.primaryTenant.phone}</small>
+          </>
+        ) : (
+          '—'
+        ),
+    },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
-      render: (s: RoomStatus) => <Tag color={ROOM_STATUS[s].color}>{ROOM_STATUS[s].label}</Tag>,
+      sorter: (a, b) => compareText(ROOM_STATUS[a.status].label, ROOM_STATUS[b.status].label),
+      render: (s: RoomStatus, r) => (
+        <>
+          <Tag color={ROOM_STATUS[s].color}>{ROOM_STATUS[s].label}</Tag>
+          {r.hasOverdueInvoice && <Tag color="red">Quá hạn</Tag>}
+        </>
+      ),
     },
     {
       title: '',
@@ -119,6 +171,13 @@ export default function RoomsPage() {
       title="Phòng"
       extra={
         <Space wrap>
+          <Input.Search
+            allowClear
+            placeholder="Tìm phòng hoặc người đại diện"
+            style={{ width: 240 }}
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
           <Select
             allowClear
             placeholder="Tất cả tòa nhà"
@@ -147,7 +206,14 @@ export default function RoomsPage() {
         </Space>
       }
     >
-      <Table rowKey="id" columns={columns} dataSource={data} loading={isLoading} scroll={{ x: 700 }} />
+      <Table
+        rowKey="id"
+        columns={columns}
+        dataSource={filtered}
+        loading={isLoading}
+        scroll={{ x: 900 }}
+        locale={keyword ? { emptyText: `Không tìm thấy phòng nào khớp "${keyword}"` } : undefined}
+      />
 
       <RoomFormModal
         open={editing !== null}

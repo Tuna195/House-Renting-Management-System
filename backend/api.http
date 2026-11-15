@@ -225,3 +225,14 @@ Content-Type: application/json
 ### Chi tiết phòng: hợp đồng hiện tại (người ở, dịch vụ) + 6 kỳ chỉ số gần nhất
 GET {{baseUrl}}/rooms/1
 Authorization: Bearer {{token}}
+
+### ---------- TV1 tuần 5: Sơ đồ phòng, tìm kiếm ----------
+
+### Danh sách phòng 1 tòa nhà cho Sơ đồ phòng: mỗi phòng có primaryTenant (người đại diện HĐ ACTIVE)
+### và hasOverdueInvoice (có hóa đơn UNPAID/PARTIAL đã qua dueDate → viền đỏ trên sơ đồ)
+GET {{baseUrl}}/rooms?buildingId=1
+Authorization: Bearer {{token}}
+
+### Khách thuê: mỗi khách có currentRoom; q tìm theo tên, SĐT hoặc tên phòng đang thuê
+GET {{baseUrl}}/tenants?q=P101
+Authorization: Bearer {{token}}

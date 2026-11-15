@@ -7,13 +7,36 @@ import type { CreateTenantInput, UpdateTenantInput } from './tenants.schema';
 // QUY TẮC BẢO MẬT QUAN TRỌNG: mọi truy vấn đều lọc theo ownerId.
 // Nếu chỉ tìm theo id, chủ nhà A có thể xem/sửa tòa nhà của chủ nhà B bằng cách đổi số trên URL.
 
-export function listTenants(ownerId: number, q?: string) {
-  return prisma.tenant.findMany({
+export async function listTenants(ownerId: number, q?: string) {
+  const tenants = await prisma.tenant.findMany({
     where: {
       ownerId,
-      ...(q && { OR: [{ fullName: { contains: q, mode: 'insensitive' } }, { phone: { contains: q } }] }),
+      // Tìm theo tên, số điện thoại hoặc tên phòng đang thuê
+      ...(q && {
+        OR: [
+          { fullName: { contains: q, mode: 'insensitive' } },
+          { phone: { contains: q } },
+          {
+            contracts: {
+              some: { contract: { status: 'ACTIVE', room: { name: { contains: q, mode: 'insensitive' } } } },
+            },
+          },
+        ],
+      }),
+    },
+    orderBy: { fullName: 'asc' },
+    include: {
+      // Phòng đang ở (qua hợp đồng ACTIVE) — hiện ở cột "Phòng" và để sắp xếp
+      contracts: {
+        where: { contract: { status: 'ACTIVE' } },
+        select: { contract: { select: { room: { select: { id: true, name: true } } } } },
+      },
     },
   });
+  return tenants.map(({ contracts, ...tenant }) => ({
+    ...tenant,
+    currentRoom: contracts[0]?.contract.room ?? null,
+  }));
 }
 
 export async function getTenant(ownerId: number, id: number) {

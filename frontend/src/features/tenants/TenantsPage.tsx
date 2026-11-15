@@ -3,11 +3,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, App, Button, Card, Input, Popconfirm, Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getErrorMessage } from '../../api/client';
 import { tenantsApi } from '../../api/tenants';
 import type { Tenant, TenantInput } from '../../types';
 import { CreateAccountModal } from './CreateAccountModal';
 import { TenantFormModal } from './TenantFormModal';
+import { compareText } from '../../utils/table';
 
 const QUERY_KEY = ['tenants'];
 
@@ -69,6 +71,7 @@ export default function TenantsPage() {
     {
       title: 'Họ tên',
       dataIndex: 'fullName',
+      sorter: (a, b) => compareText(a.fullName, b.fullName),
       render: (name: string, tenant) => (
         <>
           <b>{name}</b>
@@ -76,6 +79,17 @@ export default function TenantsPage() {
           <small>{tenant.phone}</small>
         </>
       ),
+    },
+    {
+      title: 'Phòng',
+      dataIndex: 'currentRoom',
+      sorter: (a, b) => compareText(a.currentRoom?.name, b.currentRoom?.name),
+      render: (_, tenant) =>
+        tenant.currentRoom ? (
+          <Link to={`/rooms/${tenant.currentRoom.id}`}>{tenant.currentRoom.name}</Link>
+        ) : (
+          <Tag>Chưa ở</Tag>
+        ),
     },
     {
       title: 'CCCD',
@@ -86,6 +100,7 @@ export default function TenantsPage() {
     {
       title: 'Quê quán',
       dataIndex: 'hometown',
+      sorter: (a, b) => compareText(a.hometown, b.hometown),
       render: (hometown: string | null) => hometown || '—',
     },
     {
@@ -96,6 +111,7 @@ export default function TenantsPage() {
     {
       title: 'Tài khoản',
       align: 'center',
+      sorter: (a, b) => Number(!!a.userId) - Number(!!b.userId),
       render: (_, tenant) => (tenant.userId ? <Tag color="green">Đã cấp</Tag> : <Tag color="default">Chưa cấp</Tag>),
     },
     {
@@ -126,7 +142,7 @@ export default function TenantsPage() {
         <Space wrap>
           <Input.Search
             allowClear
-            placeholder="Tìm tên hoặc số điện thoại"
+            placeholder="Tìm tên, số điện thoại hoặc phòng"
             value={searchText}
             onChange={(event) => {
               setSearchText(event.target.value);
