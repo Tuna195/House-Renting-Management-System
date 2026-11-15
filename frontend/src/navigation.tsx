@@ -39,5 +39,5 @@ export const tenantNav: NavItem[] = [
   { path: '/portal', label: 'Trang chủ', icon: <HomeOutlined /> },
   { path: '/portal/invoices', label: 'Hóa đơn', icon: <FileTextOutlined />, owner: 'TV4', week: 5 },
   { path: '/portal/contract', label: 'Hợp đồng', icon: <FileDoneOutlined />, owner: 'TV4', week: 5 },
-  { path: '/portal/maintenance', label: 'Báo sự cố', icon: <AlertOutlined />, owner: 'TV4', week: 3 },
+  { path: '/portal/maintenance', label: 'Báo sự cố', icon: <AlertOutlined /> },
 ];

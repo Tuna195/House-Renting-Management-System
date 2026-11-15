@@ -160,3 +160,32 @@ Authorization: Bearer {{token}}
 ### Query ID lặp → 400
 GET {{baseUrl}}/meter-readings?buildingId=1&buildingId=2&period=2026-10
 Authorization: Bearer {{token}}
+
+### =============================================================================
+### TV4 — CỔNG KHÁCH THUÊ (PORTAL) & BÁO SỰ CỐ
+### =============================================================================
+
+### Đăng nhập tài khoản khách thuê demo
+# @name tenantLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "khach@demo.vn", "password": "123456" }
+
+### Lấy token của khách thuê
+@tenantToken = {{tenantLogin.response.body.token}}
+
+### Khách xem danh sách các sự cố của mình
+GET {{baseUrl}}/portal/maintenance
+Authorization: Bearer {{tenantToken}}
+
+### Khách gửi yêu cầu báo sự cố mới (Phòng tự động lấy theo hợp đồng ACTIVE)
+POST {{baseUrl}}/portal/maintenance
+Authorization: Bearer {{tenantToken}}
+Content-Type: application/json
+
+{
+  "title": "Hỏng vòi nước bồn rửa bát",
+  "description": "Vòi bị rỉ nước liên tục từ tối qua, vặn chặt van vẫn nhỏ giọt. Nhờ chủ nhà gọi thợ qua sớm giúp mình."
+}
+
