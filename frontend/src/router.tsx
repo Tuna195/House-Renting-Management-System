@@ -1,3 +1,4 @@
+import MeterReadingsPage from './features/meter-readings/MeterReadingsPage';
 import { createBrowserRouter, type RouteObject } from 'react-router-dom';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
       { path: 'contracts', element: <ContractsPage /> },
       { path: 'rooms/:id', element: <RoomDetailPage /> },
       { path: 'services', element: <ServicesPage /> },
+      { path: 'meter-readings', element: <MeterReadingsPage /> },
       // Thêm trang thật ở đây
       { path: 'maintenance', element: <LandlordMaintenancePage /> }, // TV4 — Tuần 4
       ...comingSoonRoutes(landlordNav),

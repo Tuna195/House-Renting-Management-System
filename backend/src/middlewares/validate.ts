@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 import { z, type ZodTypeAny } from 'zod';
-import { AppError } from '../utils/app-error';
+import { validationError } from '../utils/api-errors';
 
 // Thông báo mặc định tiếng Việt cho các lỗi chưa tự đặt message trong schema
 z.setErrorMap((issue, ctx) => {
@@ -14,13 +14,13 @@ z.setErrorMap((issue, ctx) => {
 });
 
 // Kiểm tra req.body theo một zod schema trước khi vào controller.
-// Dữ liệu sai → trả 400 kèm chi tiết từng trường; đúng → req.body được thay bằng dữ liệu đã làm sạch.
+// Dữ liệu sai → trả 400 kèm chi tiết có path/code/message của từng trường; đúng → req.body được thay bằng dữ liệu đã làm sạch.
 export const validateBody =
   (schema: ZodTypeAny): RequestHandler =>
   (req, _res, next) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      return next(new AppError(400, 'Dữ liệu không hợp lệ', result.error.flatten().fieldErrors));
+      return next(validationError(result.error.issues));
     }
     req.body = result.data;
     next();
