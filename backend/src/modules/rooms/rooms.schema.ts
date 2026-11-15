@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { databaseIdSchema, httpIdSchema } from '../../validation/id.schema';
 
 export const createRoomSchema = z.object({
-  buildingId: z.number().int().positive('Vui lòng chọn tòa nhà'),
+  buildingId: databaseIdSchema,
   name: z.string().trim().min(1, 'Vui lòng nhập tên phòng'),
   floor: z.number().int().min(0, 'Tầng không được âm').nullish(), // nullish: cho phép xóa trắng khi sửa
   area: z.number().positive('Diện tích phải lớn hơn 0').nullish(),
@@ -16,9 +17,9 @@ export const updateRoomSchema = createRoomSchema
   .partial()
   .extend({ status: z.enum(['VACANT', 'MAINTENANCE']).optional() });
 
-// req.query luôn là chuỗi → z.coerce.number() để đổi "3" thành 3
+// Query phải đúng định dạng ID trước khi chuyển chuỗi sang number.
 export const listRoomsQuerySchema = z.object({
-  buildingId: z.coerce.number().int().positive().optional(),
+  buildingId: httpIdSchema.optional(),
   status: z.enum(['VACANT', 'OCCUPIED', 'MAINTENANCE']).optional(),
 });
 

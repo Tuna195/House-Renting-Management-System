@@ -1,3 +1,4 @@
+import meterRoutes from './modules/meter-readings/meter-readings.routes';
 import { Router } from 'express';
 import authRoutes from './modules/auth/auth.routes';
 import buildingRoutes from './modules/buildings/buildings.routes';
@@ -17,6 +18,7 @@ api.use('/auth', authRoutes);
 api.use('/buildings', buildingRoutes);
 api.use('/tenants', tenantRoutes);
 api.use('/rooms', roomRoutes);
+api.use('/meter-readings', meterRoutes);
 api.use('/portal', portalRoutes); // TV4 — Tuần 3 (Cổng khách thuê: Báo sự cố, Tuần 5 thêm HĐ, hóa đơn)
 
 // TODO — các module sẽ thêm (xem docs/05-api.md để biết ai phụ trách):

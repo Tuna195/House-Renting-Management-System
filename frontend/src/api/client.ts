@@ -28,7 +28,11 @@ api.interceptors.response.use(
 // Lấy câu thông báo lỗi tiếng Việt từ backend để hiển thị
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
-    return error.response?.data?.message ?? 'Không kết nối được máy chủ';
+    const data: unknown = error.response?.data;
+    if (typeof data === 'object' && data !== null && 'message' in data && typeof data.message === 'string') {
+      return data.message;
+    }
+    return 'Không kết nối được máy chủ';
   }
   return 'Đã có lỗi xảy ra';
 }

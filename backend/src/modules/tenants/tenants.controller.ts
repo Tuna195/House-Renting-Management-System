@@ -26,7 +26,7 @@ export async function remove(req: Request, res: Response) {
 }
 
 export async function createAccount(req: Request, res: Response) {
-  const tenantId = Number(req.params.id); // Lấy :id từ URL
+  const tenantId = parseId(req.params.id); // Validate ID tại biên HTTP trước khi gọi service
   const input = req.body; // Lấy { email, password }
 
   const result = await service.createTenantAccount(currentUser(req).id, tenantId, input);
