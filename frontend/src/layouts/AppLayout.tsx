@@ -2,6 +2,7 @@ import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Dropdown, Grid, Layout, Menu, Typography } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
+import { NotificationBell } from '../components/NotificationBell';
 import type { NavItem } from '../navigation';
 
 // Khung giao diện dùng chung cho chủ nhà và khách thuê: menu trái + header + nội dung
@@ -30,8 +31,9 @@ export function AppLayout({ nav, title }: { nav: NavItem[]; title: string }) {
       </Layout.Sider>
       <Layout>
         <Layout.Header
-          style={{ background: '#fff', padding: '0 16px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}
+          style={{ background: '#fff', padding: '0 16px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 4 }}
         >
+          <NotificationBell />
           <Dropdown
             menu={{
               items: [{ key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: logout }],

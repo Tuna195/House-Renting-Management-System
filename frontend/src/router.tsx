@@ -15,7 +15,8 @@ import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 import TenantHomePage from './pages/TenantHomePage';
 
-import MaintenancePage from './features/portal/MaintenancePage';
+import TenantMaintenancePage from './features/portal/MaintenancePage';
+import LandlordMaintenancePage from './features/maintenance/MaintenancePage';
 
 // Tự tạo route "Đang phát triển" cho các mục menu chưa làm (có owner trong navigation.tsx)
 const comingSoonRoutes = (nav: NavItem[]): RouteObject[] =>
@@ -37,12 +38,12 @@ export const router = createBrowserRouter([
       { index: true, element: <DashboardPage /> },
       { path: 'buildings', element: <BuildingsPage /> },
       { path: 'tenants', element: <TenantsPage /> },
-      // Thêm trang thật ở đây, VD: { path: 'rooms', element: <RoomsPage /> },
       { path: 'rooms', element: <RoomsPage /> },
       { path: 'contracts', element: <ContractsPage /> },
       { path: 'rooms/:id', element: <RoomDetailPage /> },
       { path: 'services', element: <ServicesPage /> },
       // Thêm trang thật ở đây
+      { path: 'maintenance', element: <LandlordMaintenancePage /> }, // TV4 — Tuần 4
       ...comingSoonRoutes(landlordNav),
     ],
   },
@@ -57,7 +58,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <TenantHomePage /> },
-      { path: 'maintenance', element: <MaintenancePage /> },
+      { path: 'maintenance', element: <TenantMaintenancePage /> },
       ...comingSoonRoutes(tenantNav),
     ],
   },

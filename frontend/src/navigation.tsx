@@ -32,7 +32,7 @@ export const landlordNav: NavItem[] = [
   { path: '/contracts', label: 'Hợp đồng', icon: <FileDoneOutlined /> },
   { path: '/meter-readings', label: 'Chỉ số điện nước', icon: <ThunderboltOutlined />, owner: 'TV3', week: 4 },
   { path: '/invoices', label: 'Hóa đơn', icon: <FileTextOutlined />, owner: 'TV3', week: 5 },
-  { path: '/maintenance', label: 'Sự cố', icon: <ToolOutlined />, owner: 'TV4', week: 4 },
+  { path: '/maintenance', label: 'Sự cố', icon: <ToolOutlined /> },
 ];
 
 export const tenantNav: NavItem[] = [
