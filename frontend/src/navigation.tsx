@@ -31,7 +31,7 @@ export const landlordNav: NavItem[] = [
   { path: '/tenants', label: 'Khách thuê', icon: <TeamOutlined /> },
   { path: '/contracts', label: 'Hợp đồng', icon: <FileDoneOutlined /> },
   { path: '/meter-readings', label: 'Chỉ số điện nước', icon: <ThunderboltOutlined />, owner: 'TV3', week: 4 },
-  { path: '/invoices', label: 'Hóa đơn', icon: <FileTextOutlined />, owner: 'TV3', week: 5 },
+  { path: '/invoices', label: 'Hóa đơn', icon: <FileTextOutlined /> },
   { path: '/maintenance', label: 'Sự cố', icon: <ToolOutlined /> },
 ];
 

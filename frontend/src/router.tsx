@@ -6,6 +6,8 @@ import { RequireAuth } from './features/auth/RequireAuth';
 import BuildingsPage from './features/buildings/BuildingsPage';
 import TenantsPage from './features/tenants/TenantsPage';
 import RoomsPage from './features/rooms/RoomsPage';
+import InvoicesPage from './features/invoices/InvoicesPage';
+import InvoiceDetailPage from './features/invoices/InvoiceDetailPage';
 import ContractsPage from './features/contracts/ContractsPage';
 import RoomDetailPage from './features/rooms/RoomDetailPage';
 import ServicesPage from './features/services/ServicesPage';
@@ -44,6 +46,8 @@ export const router = createBrowserRouter([
       { path: 'rooms/:id', element: <RoomDetailPage /> },
       { path: 'services', element: <ServicesPage /> },
       { path: 'meter-readings', element: <MeterReadingsPage /> },
+      { path: 'invoices', element: <InvoicesPage /> },
+      { path: 'invoices/:id', element: <InvoiceDetailPage /> },
       // Thêm trang thật ở đây
       { path: 'maintenance', element: <LandlordMaintenancePage /> }, // TV4 — Tuần 4
       ...comingSoonRoutes(landlordNav),

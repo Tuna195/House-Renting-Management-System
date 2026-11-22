@@ -2,6 +2,12 @@
 # Mỗi người làm module mới thì thêm request mẫu của module mình vào cuối file.
 
 @baseUrl = http://localhost:4000/api
+# Tuần 05: thay giá trị bằng kết quả từ prisma/seed-invoice-demo.ts và API danh sách.
+@invoiceDemoEmail = invoice-owner@example.test
+@invoiceDemoPassword = InvoiceDemo2026!
+@invoiceBuilding = 1
+@invoicePeriod = 2026-10
+@invoiceId = 1
 
 ### Kiểm tra server
 GET {{baseUrl}}/health
@@ -291,3 +297,25 @@ Authorization: Bearer {{token}}
 ### Query ID lặp → 400
 GET {{baseUrl}}/meter-readings?buildingId=1&buildingId=2&period=2026-10
 Authorization: Bearer {{token}}
+
+### Đăng nhập chủ nhà của bộ dữ liệu P101–P103
+# @name invoiceLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "{{invoiceDemoEmail}}", "password": "{{invoiceDemoPassword}}" }
+
+### Tạo hóa đơn nháp. Lần đầu tạo 1, lần sau tạo 0.
+POST {{baseUrl}}/invoices/generate
+Authorization: Bearer {{invoiceLogin.response.body.token}}
+Content-Type: application/json
+
+{ "buildingId": {{invoiceBuilding}}, "period": "{{invoicePeriod}}" }
+
+### Danh sách hóa đơn nháp, P101 có tổng 3.940.000 đ
+GET {{baseUrl}}/invoices?buildingId={{invoiceBuilding}}&period={{invoicePeriod}}&status=DRAFT
+Authorization: Bearer {{invoiceLogin.response.body.token}}
+
+### Chi tiết hóa đơn P101, thay ID bằng id từ kết quả danh sách
+GET {{baseUrl}}/invoices/{{invoiceId}}
+Authorization: Bearer {{invoiceLogin.response.body.token}}
