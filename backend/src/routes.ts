@@ -29,11 +29,9 @@ api.use('/notifications', notificationRoutes); // TV4 — Tuần 4 (Hệ thống
 api.use('/maintenance', maintenanceRoutes); // TV4 — Tuần 4 (Quản lý sự cố phía chủ nhà)
 api.use('/meter-readings', meterRoutes);
 api.use('/invoices', invoiceRoutes);
+api.use('/contracts', contractRoutes); // TV2 — Tuần 4
 
 // TODO — các module sẽ thêm (xem docs/05-api.md để biết ai phụ trách):
-api.use('/services', serviceRoutes); // TV1 — danh sách dịch vụ cho form hợp đồng
-api.use('/contracts', contractRoutes); // TV2 — Tuần 4
-// api.use('/meter-readings', meterReadingRoutes); // TV3 — Tuần 4
 // api.use('/payments', paymentRoutes);            // TV2 — Tuần 8 (VietQR + webhook)
 // api.use('/push', pushRoutes);                   // TV4 — Tuần 9
 
