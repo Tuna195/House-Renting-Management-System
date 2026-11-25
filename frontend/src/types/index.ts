@@ -163,6 +163,58 @@ export interface RoomDetail extends Omit<Room, 'building'> {
 
 export type MaintenanceStatus = 'OPEN' | 'IN_PROGRESS' | 'DONE' | 'REJECTED';
 
+export type InvoiceStatus = 'DRAFT' | 'UNPAID' | 'PARTIAL' | 'PAID' | 'CANCELLED';
+
+export interface InvoiceItemRow {
+  id: number;
+  type: 'RENT' | 'ELECTRICITY' | 'WATER' | 'SERVICE' | 'OTHER' | 'DISCOUNT';
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+}
+
+export interface InvoiceSummary {
+  id: number;
+  contractId: number;
+  period: string;
+  status: InvoiceStatus;
+  totalAmount: number;
+  paidAmount: number;
+  dueDate: string;
+  building: { id: number; name: string };
+  room: { id: number; name: string };
+  primaryTenant: { id: number; fullName: string } | null;
+}
+
+export interface InvoiceDetail extends InvoiceSummary {
+  issuedAt: string | null;
+  paymentCode: string;
+  note: string | null;
+  items: InvoiceItemRow[];
+  payments: {
+    id: number;
+    amount: number;
+    method: 'CASH' | 'BANK_TRANSFER' | 'VIETQR';
+    paidAt: string;
+    note: string | null;
+  }[];
+}
+
+interface InvoiceContractReference {
+  roomId: number;
+  roomName: string;
+  contractId: number;
+}
+
+export type InvoiceSkipReason = 'ALREADY_EXISTS' | 'MULTIPLE_CONTRACTS' | 'PARTIAL_PERIOD';
+
+export interface InvoiceGenerationResult {
+  created: number;
+  skipped: (InvoiceContractReference & { reason: InvoiceSkipReason })[];
+  missingReadings: InvoiceContractReference[];
+}
+
 export interface MaintenanceRequest {
   id: number;
   roomId: number;

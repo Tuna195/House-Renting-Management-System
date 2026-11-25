@@ -1,11 +1,19 @@
 // Nhãn và màu Tag cho các trạng thái — dùng chung cho mọi trang để hiển thị thống nhất.
 // Thêm trạng thái của module khác (sự cố, hóa đơn...) vào cuối file này.
-import type { RoomStatus, ServiceUnit } from '../types';
+import type { InvoiceStatus, RoomStatus, ServiceUnit } from '../types';
 
 interface StatusDisplay {
   label: string;
   color: string; // tên màu preset của Ant Design Tag
 }
+
+export const INVOICE_STATUS: Record<InvoiceStatus, StatusDisplay> = {
+  DRAFT: { label: 'Nháp', color: 'default' },
+  UNPAID: { label: 'Chưa thanh toán', color: 'orange' },
+  PARTIAL: { label: 'Thanh toán một phần', color: 'blue' },
+  PAID: { label: 'Đã thanh toán', color: 'green' },
+  CANCELLED: { label: 'Đã hủy', color: 'default' },
+};
 
 export const ROOM_STATUS: Record<RoomStatus, StatusDisplay> = {
   VACANT: { label: 'Trống', color: 'green' },

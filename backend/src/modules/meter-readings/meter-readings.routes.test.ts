@@ -4,8 +4,8 @@ import { Prisma } from '@prisma/client';
 import { validateBody } from '../../middlewares/validate';
 import { AppError } from '../../utils/app-error';
 import express, { type RequestHandler } from 'express';
-import { createServer, type Server } from 'node:http';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createTestRequest } from '../../../test-utils/http-request';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { errorHandler } from '../../middlewares/error-handler';
 import { parseId } from '../../utils/app-error';
 
@@ -25,35 +25,22 @@ vi.mock('../../middlewares/auth', () => ({
 }));
 import meterRoutes from './meter-readings.routes';
 
-let server: Server;
-let baseUrl: string;
-beforeAll(async () => {
-  const app = express();
-  app.use(express.json());
-  app.use('/api/meter-readings', meterRoutes);
-  // Cùng helper parseId đang dùng ở buildings, rooms và tenants.
-  app.get('/id/:id', (req, res) => res.json({ id: parseId(req.params.id) }));
-  app.post('/body', validateBody(z.object({ value: z.number().int() })), (_req, res) => res.json({ ok: true }));
-  app.get('/conflict', () => { throw new AppError(409, 'Xung đột'); });
-  app.get('/write-conflict', () => { throw new Prisma.PrismaClientKnownRequestError('internal', {
-    code: 'P2034', clientVersion: '6',
-  }); });
-  app.get('/db-error', () => { throw new Prisma.PrismaClientKnownRequestError('internal', {
-    code: 'P2002', clientVersion: '6', meta: { internal: 'private metadata' },
-  }); });
-  app.use(errorHandler);
-  server = createServer(app);
-  await new Promise<void>((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', resolve);
-  });
-  const address = server.address();
-  if (!address || typeof address === 'string') throw new Error('Không lấy được cổng test');
-  baseUrl = `http://127.0.0.1:${address.port}`;
-});
-afterAll(async () => {
-  if (server?.listening) await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
-});
+const app = express();
+app.use(express.json());
+app.use('/api/meter-readings', meterRoutes);
+// Cùng helper parseId đang dùng ở buildings, rooms và tenants.
+app.get('/id/:id', (req, res) => res.json({ id: parseId(req.params.id) }));
+app.post('/body', validateBody(z.object({ value: z.number().int() })), (_req, res) => res.json({ ok: true }));
+app.get('/conflict', () => { throw new AppError(409, 'Xung đột'); });
+app.get('/write-conflict', () => { throw new Prisma.PrismaClientKnownRequestError('internal', {
+  code: 'P2034', clientVersion: '6',
+}); });
+app.get('/db-error', () => { throw new Prisma.PrismaClientKnownRequestError('internal', {
+  code: 'P2002', clientVersion: '6', meta: { internal: 'private metadata' },
+}); });
+app.use(errorHandler);
+const request = createTestRequest(app);
+
 beforeEach(() => {
   vi.clearAllMocks();
   db.building.findFirst.mockResolvedValue(null);
@@ -72,25 +59,25 @@ function expectNoDatabaseAccess() {
 describe('ID validation tại biên HTTP', () => {
   it.each(['2147483648', '1e3', '0x10', '01', '%2B1', '%201', '1.5', '0', '-1', '99999999999999999999'])
     ('GET buildingId=%s trả 400 và không vào Prisma', async (id) => {
-      const response = await fetch(`${baseUrl}/api/meter-readings?buildingId=${id}&period=2026-10`);
+      const response = await request(`/api/meter-readings?buildingId=${id}&period=2026-10`);
       expect(response.status).toBe(400);
       expect(await response.json()).toMatchObject({ details: [expect.objectContaining({ path: ['buildingId'] })] });
       expectNoDatabaseAccess();
     });
   it.each(['', 'buildingId=1&buildingId=2', 'buildingId[id]=1', 'buildingId[]=1'])
     ('từ chối query thiếu/lặp/cấu trúc sai: %s', async (query) => {
-      const response = await fetch(`${baseUrl}/api/meter-readings?${query}&period=2026-10`);
+      const response = await request(`/api/meter-readings?${query}&period=2026-10`);
       expect(response.status).toBe(400);
       expectNoDatabaseAccess();
     });
   it('ID hợp lệ nhưng không tồn tại vẫn trả 404, không chuyển thành 400', async () => {
-    const response = await fetch(`${baseUrl}/api/meter-readings?buildingId=2147483647&period=2026-10`);
+    const response = await request(`/api/meter-readings?buildingId=2147483647&period=2026-10`);
     expect(response.status).toBe(404);
     expect(db.building.findFirst).toHaveBeenCalledWith({ where: { id: 2147483647, ownerId: 1 } });
   });
   it('query hợp lệ truyền ID kiểu number tới Prisma', async () => {
     db.building.findFirst.mockResolvedValue({ id: 1 });
-    const response = await fetch(`${baseUrl}/api/meter-readings?buildingId=1&period=2026-10`);
+    const response = await request(`/api/meter-readings?buildingId=1&period=2026-10`);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual([]);
     expect(db.building.findFirst).toHaveBeenCalledWith({ where: { id: 1, ownerId: 1 } });
@@ -103,7 +90,7 @@ describe('ID validation tại biên HTTP', () => {
     { buildingId: 1, roomId: true },
     { buildingId: 1, roomId: [1] },
   ])('PUT body ID sai %j trả 400, không mở transaction', async ({ buildingId, roomId }) => {
-    const response = await fetch(`${baseUrl}/api/meter-readings/bulk`, {
+    const response = await request(`/api/meter-readings/bulk`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ buildingId, period: '2026-10', readings: [
         { roomId, electricStart: 0, electricEnd: 1, waterStart: 0, waterEnd: 1 },
@@ -113,7 +100,7 @@ describe('ID validation tại biên HTTP', () => {
     expectNoDatabaseAccess();
   });
   it.each(['2147483648', '1e3', '0x10', '01', '1.5'])('ID path sai %s trả HTTP 400', async (id) => {
-    const response = await fetch(`${baseUrl}/id/${id}`);
+    const response = await request(`/id/${id}`);
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({ details: [expect.objectContaining({ path: ['id'] })] });
     expectNoDatabaseAccess();
@@ -123,7 +110,7 @@ describe('ID validation tại biên HTTP', () => {
 
 describe('Hợp đồng lỗi API', () => {
   it('validation body và query cùng trả code/path/message, không lộ Zod metadata', async () => {
-    const response = await fetch(`${baseUrl}/body`, {
+    const response = await request(`/body`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ value: 'secret-input' }),
     });
     expect(response.status).toBe(400);
@@ -134,24 +121,24 @@ describe('Hợp đồng lỗi API', () => {
     expect(JSON.stringify(body)).not.toContain('secret-input');
   });
   it('JSON hỏng trả 400 với mã INVALID_JSON', async () => {
-    const response = await fetch(`${baseUrl}/body`, {
+    const response = await request(`/body`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{',
     });
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({ code: 'INVALID_JSON', details: [] });
   });
   it('xung đột nghiệp vụ giữ HTTP 409 và code ổn định', async () => {
-    const response = await fetch(`${baseUrl}/conflict`);
+    const response = await request(`/conflict`);
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({ code: 'CONFLICT', message: 'Xung đột', details: [] });
   });
   it('không đưa metadata của Prisma vào response lỗi', async () => {
-    const response = await fetch(`${baseUrl}/db-error`);
+    const response = await request(`/db-error`);
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({ code: 'DUPLICATE_RESOURCE', message: 'Dữ liệu bị trùng', details: [] });
   });
   it('lỗi chỉ số giảm xác định đúng ô, không mở transaction', async () => {
-    const response = await fetch(`${baseUrl}/api/meter-readings/bulk`, {
+    const response = await request(`/api/meter-readings/bulk`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ buildingId: 1, period: '2026-10', readings: [
         { roomId: 1, electricStart: 10, electricEnd: 1, waterStart: 0, waterEnd: 1 },
@@ -166,7 +153,7 @@ describe('Hợp đồng lỗi API', () => {
   it('phòng đã phát hành hóa đơn có code và vị trí phòng, không ghi dữ liệu', async () => {
     db.building.findFirst.mockResolvedValue({ id: 1 });
     db.invoice.findFirst.mockResolvedValue({ id: 1 });
-    const response = await fetch(`${baseUrl}/api/meter-readings/bulk`, {
+    const response = await request(`/api/meter-readings/bulk`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ buildingId: 1, period: '2026-10', readings: [
         { roomId: 1, electricStart: 0, electricEnd: 1, waterStart: 0, waterEnd: 1 },
@@ -181,7 +168,7 @@ describe('Hợp đồng lỗi API', () => {
 });
 
 it('xung đột transaction P2034 trả WRITE_CONFLICT, không báo thành công hoặc 500', async () => {
-  const response = await fetch(`${baseUrl}/write-conflict`);
+  const response = await request(`/write-conflict`);
   expect(response.status).toBe(409);
   expect(await response.json()).toMatchObject({ code: 'WRITE_CONFLICT', details: [] });
 });
