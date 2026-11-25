@@ -1,11 +1,19 @@
 // Nhãn và màu Tag cho các trạng thái — dùng chung cho mọi trang để hiển thị thống nhất.
 // Thêm trạng thái của module khác (sự cố, hóa đơn...) vào cuối file này.
-import type { RoomStatus } from '../types';
+import type { InvoiceStatus, RoomStatus, ServiceUnit } from '../types';
 
 interface StatusDisplay {
   label: string;
   color: string; // tên màu preset của Ant Design Tag
 }
+
+export const INVOICE_STATUS: Record<InvoiceStatus, StatusDisplay> = {
+  DRAFT: { label: 'Nháp', color: 'default' },
+  UNPAID: { label: 'Chưa thanh toán', color: 'orange' },
+  PARTIAL: { label: 'Thanh toán một phần', color: 'blue' },
+  PAID: { label: 'Đã thanh toán', color: 'green' },
+  CANCELLED: { label: 'Đã hủy', color: 'default' },
+};
 
 export const ROOM_STATUS: Record<RoomStatus, StatusDisplay> = {
   VACANT: { label: 'Trống', color: 'green' },
@@ -48,3 +56,23 @@ export const maintenanceStatusMap: Record<MaintenanceStatus, StatusConfig> = {
     badgeStatus: 'error',
   },
 };
+
+// -----------------------------------------------------------------------------
+// TV1 — Đơn vị tính dịch vụ
+// -----------------------------------------------------------------------------
+
+interface ServiceUnitDisplay {
+  label: string; // tên đầy đủ, dùng trong Select
+  suffix: string; // hậu tố sau giá: "50.000 ₫/phòng"
+}
+
+export const SERVICE_UNIT: Record<ServiceUnit, ServiceUnitDisplay> = {
+  PER_ROOM: { label: 'Theo phòng', suffix: '/phòng' },
+  PER_PERSON: { label: 'Theo người', suffix: '/người' },
+  PER_QUANTITY: { label: 'Theo số lượng (VD: xe)', suffix: '/xe (số lượng)' },
+};
+
+export const SERVICE_UNIT_OPTIONS = (Object.keys(SERVICE_UNIT) as ServiceUnit[]).map((value) => ({
+  value,
+  label: `${SERVICE_UNIT[value].label} — ${SERVICE_UNIT[value].suffix}`,
+}));

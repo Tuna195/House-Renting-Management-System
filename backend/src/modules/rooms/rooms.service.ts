@@ -22,12 +22,20 @@ export async function getRoom(ownerId: number, id: number) {
   const room = await prisma.room.findFirst({
     where: { id, building: { ownerId } },
     include: {
-      building: { select: { id: true, name: true } },
-      // Hợp đồng đang hiệu lực (nếu có) kèm danh sách người ở
+      building: { select: { id: true, name: true, address: true } },
+      // Hợp đồng đang hiệu lực (nếu có) kèm danh sách người ở và dịch vụ đang dùng
       contracts: {
         where: { status: 'ACTIVE' },
-        include: { tenants: { include: { tenant: { select: { id: true, fullName: true, phone: true } } } } },
+        include: {
+          tenants: {
+            orderBy: { isPrimary: 'desc' }, // người đại diện lên đầu
+            include: { tenant: { select: { id: true, fullName: true, phone: true } } },
+          },
+          services: { include: { service: true } },
+        },
       },
+      // 6 kỳ chỉ số gần nhất ("YYYY-MM" sắp xếp theo chuỗi đúng thứ tự thời gian)
+      meterReadings: { orderBy: { period: 'desc' }, take: 6 },
       _count: { select: { contracts: true } },
     },
   });

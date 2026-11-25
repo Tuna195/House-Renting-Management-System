@@ -66,6 +66,18 @@ model Building {
   owner    User      @relation(fields: [ownerId], references: [id])
   rooms    Room[]
   services Service[]
+  electricityTiers BuildingElectricityTier[]
+}
+
+model BuildingElectricityTier {
+  id         Int  @id @default(autoincrement())
+  buildingId Int
+  upTo       Int? // Mốc kWh lũy kế, null cho bậc cuối.
+  price      Int  // VND/kWh
+
+  building Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  @@unique([buildingId, upTo])
 }
 
 enum RoomStatus {

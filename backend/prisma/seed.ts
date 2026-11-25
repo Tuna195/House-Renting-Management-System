@@ -7,6 +7,12 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 const DEMO_PASSWORD = '123456';
+const DEMO_BUILDING_NAME = 'Nhà trọ Bách Khoa';
+const DEMO_ELECTRICITY_TIERS = [
+  { upTo: 50, price: 2000 },
+  { upTo: 100, price: 2500 },
+  { upTo: null, price: 3000 },
+];
 
 function previousPeriod(): string {
   const d = new Date();
@@ -18,6 +24,17 @@ function previousPeriod(): string {
 async function main() {
   const existing = await prisma.user.findUnique({ where: { email: 'chunha@demo.vn' } });
   if (existing) {
+    // Bổ sung cho DB demo cũ, giữ nguyên biểu giá đã được người dùng cấu hình.
+    const building = await prisma.building.findFirst({
+      where: { ownerId: existing.id, name: DEMO_BUILDING_NAME, electricityTiers: { none: {} } },
+      select: { id: true },
+    });
+    if (building) {
+      await prisma.buildingElectricityTier.createMany({
+        data: DEMO_ELECTRICITY_TIERS.map((tier) => ({ ...tier, buildingId: building.id })),
+        skipDuplicates: true,
+      });
+    }
     console.log('ℹ️  Dữ liệu demo đã có. Muốn tạo lại từ đầu: npm run db:reset');
     return;
   }
@@ -31,12 +48,13 @@ async function main() {
   const building = await prisma.building.create({
     data: {
       ownerId: landlord.id,
-      name: 'Nhà trọ Bách Khoa',
+      name: DEMO_BUILDING_NAME,
       address: 'Số 1 Tạ Quang Bửu, Hai Bà Trưng, Hà Nội',
       electricityPrice: 3500,
       waterPrice: 25000,
       waterBillingType: 'PER_M3',
       invoiceDueDay: 5,
+      electricityTiers: { create: DEMO_ELECTRICITY_TIERS },
       services: {
         create: [
           { name: 'Internet', price: 100000, unit: 'PER_ROOM' },
